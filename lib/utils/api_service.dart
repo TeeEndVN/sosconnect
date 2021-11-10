@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:sosconnect/models/group.dart';
+import 'package:sosconnect/models/request.dart';
 import 'package:sosconnect/models/profile.dart';
 import 'package:sosconnect/utils/custom_exception.dart';
 import 'package:sosconnect/utils/jwt.dart';
@@ -102,6 +104,138 @@ class ApiService {
     return false;
   }
 
+  // 1.14. API tạo yêu cầu hỗ trợ
+  static Future<bool> addRqSupport(int groupId, String content) async {
+    var uri = Uri.parse(
+        'https://sos-connect-api.herokuapp.com/groups/$groupId/requests');
+    var accessToken = Jwt.accessToken;
+    var response = await http.post(uri,
+        headers: {
+          "Content-Type": "application/json",
+          HttpHeaders.authorizationHeader: 'Bearer $accessToken'
+        },
+        body: jsonEncode(<String, String>{
+          'content': content,
+        }));
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      throw CustomException("Đã xảy ra lỗi tạo yêu cầu hỗ trợ");
+    }
+  }
+
+  //1.25. API chỉnh sửa yêu cầu hổ trợ
+  static Future<bool> updateRqSupport(int requestId, String content) async {
+    var uri = Uri.https(
+        'https://sos-connect-api.herokuapp.com', '/groups/$requestId/requests');
+    var accessToken = Jwt.accessToken;
+    var response = await http.put(uri,
+        headers: {
+          "Content-Type": "application/json",
+          HttpHeaders.authorizationHeader: 'Bearer $accessToken'
+        },
+        body: jsonEncode(<String, String>{
+          'content': content,
+        }));
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      throw CustomException("Đã xảy ra lỗi chỉnh sửa yêu cầu hỗ trợ");
+    }
+  }
+
+  //1.26. API xóa mềm yêu cầu hổ trợ
+  static Future<bool> removeRqSupport(int requestId) async {
+    var uri = Uri.https(
+        'https://sos-connect-api.herokuapp.com', '/groups/$requestId/requests');
+    var accessToken = Jwt.accessToken;
+    var response = await http.delete(
+      uri,
+      headers: {HttpHeaders.authorizationHeader: 'Bearer $accessToken'},
+    );
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      throw CustomException("Đã xảy ra lỗi không thể xóa mềm yêu cầu hỗ trợ");
+    }
+  }
+
+  // 1.28.API người yêu cầu hỗ trợ xác nhận đã nhận hỗ trợ
+  static Future<bool> confirmSupport(int supportId, bool isConfirm) async {
+    var uri = Uri.https(
+        'https://sos-connect-api.herokuapp.com', '/supports/$supportId');
+    var accessToken = Jwt.accessToken;
+    var response = await http.put(uri,
+        headers: {
+          "Content-Type": "application/json",
+          HttpHeaders.authorizationHeader: 'Bearer $accessToken'
+        },
+        body: jsonEncode(<String, String>{
+          'is_confirmed': isConfirm ? '1' : '0',
+        }));
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      throw CustomException("Đã xảy ra lỗi không thể xác nhận đã nhận hỗ trợ");
+    }
+  }
+
+  //1.24.API tạo hỗ trợ
+  static Future<bool> createSupport(int requestId, String content) async {
+    var uri = Uri.parse(
+        'https://sos-connect-api.herokuapp.com/requests/$requestId/supports');
+    var accessToken = Jwt.accessToken;
+    var response = await http.post(uri,
+        headers: {
+          "Content-Type": "application/json",
+          HttpHeaders.authorizationHeader: 'Bearer $accessToken'
+        },
+        body: jsonEncode(<String, String>{
+          'content': content,
+        }));
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      throw CustomException("Đã xảy ra lỗi tạo hỗ trợ");
+    }
+  }
+
+  //1.29. API người hỗ trợ chỉnh sửa nội dung hỗ trợ
+  static Future<bool> editSupport(int supportId, String content) async {
+    var uri = Uri.https(
+        'https://sos-connect-api.herokuapp.com', '/supports/$supportId');
+    var accessToken = Jwt.accessToken;
+    var response = await http.put(uri,
+        headers: {
+          "Content-Type": "application/json",
+          HttpHeaders.authorizationHeader: 'Bearer $accessToken'
+        },
+        body: jsonEncode(<String, String>{
+          'content': content,
+        }));
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      throw CustomException("Đã xảy ra lỗi chỉnh sửa nội dung hỗ trợ");
+    }
+  }
+
+  // 1.30.API người hỗ trợ xóa mềm hỗ trợ
+  static Future<bool> removeSupport(int supportId) async {
+    var uri = Uri.https(
+        'https://sos-connect-api.herokuapp.com', '/supports/$supportId');
+    var accessToken = Jwt.accessToken;
+    var response = await http.delete(
+      uri,
+      headers: {HttpHeaders.authorizationHeader: 'Bearer $accessToken'},
+    );
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      throw CustomException("Đã xảy ra lỗi không thể xóa mềm trong hỗ trợ");
+    }
+  }
+
   static Future<bool> addProfile(
       String lastName,
       String firstName,
@@ -172,6 +306,44 @@ class ApiService {
       return true;
     } else {
       throw CustomException("Đã xảy ra lỗi");
+    }
+  }
+
+  // 1.19.API xóa mềm profile
+  static Future<bool> softDeleteProfile(String userName) async {
+    var uri = Uri.https(
+        ' https://sos-connect-api.herokuapp.com', '/profiles/$userName');
+    var accessToken = Jwt.accessToken;
+    var response = await http.delete(
+      uri,
+      headers: {HttpHeaders.authorizationHeader: 'Bearer $accessToken'},
+    );
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      throw CustomException("Đã xảy ra lỗi không thể xóa mềm Profiles");
+    }
+  }
+
+  //1.9.API người dùng tham gia group
+  static Future<bool> memberGroup(
+      int groupId, bool role, bool isAdminInvite) async {
+    var uri = Uri.parse(
+        'https://sos-connect-api.herokuapp.com/groups/$groupId/users');
+    var accessToken = Jwt.accessToken;
+    var response = await http.post(uri,
+        headers: {
+          "Content-Type": "application/json",
+          HttpHeaders.authorizationHeader: 'Bearer $accessToken'
+        },
+        body: jsonEncode(<String, String>{
+          'as_role': role ? '1' : '0',
+          'is_admin_invited': isAdminInvite ? '1' : '0',
+        }));
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      throw CustomException("Đã xảy ra lỗi người dùng tham gia group");
     }
   }
 }
