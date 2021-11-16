@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:jwt_decoder/jwt_decoder.dart';
-import 'package:sosconnect/utils/jwt.dart';
 
 class Index extends StatefulWidget {
   Index({Key? key}) : super(key: key);
@@ -75,11 +73,5 @@ class _IndexState extends State<Index> {
         onTap: _onItemTapped,
       ),
     );
-  }
-
-  String returnUsername() {
-    String _accessToken = Jwt.accessToken;
-    Map<String, dynamic> decodedToken = JwtDecoder.decode(_accessToken);
-    return decodedToken['username'];
   }
 }

@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:jwt_decoder/jwt_decoder.dart';
-import 'package:sosconnect/pages/index.dart';
-import 'package:sosconnect/pages/login.dart';
-import 'package:sosconnect/utils/jwt.dart';
-import 'package:sosconnect/utils/user_secure_storage.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sosconnect/blocs/auth/auth_cubit.dart';
+import 'package:sosconnect/navigators/auth_navigator.dart';
+import 'package:sosconnect/utils/repository.dart';
 
 void main() {
   runApp(const MyApp());
@@ -25,38 +23,12 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: FutureBuilder(
-        future: hasToken,
-        builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
-          if (snapshot.hasData) {
-            var _hasToken = snapshot.data;
-            if (_hasToken = false) {
-              return Login();
-            } else {
-              if (JwtDecoder.isExpired(Jwt.accessToken)) {
-                Fluttertoast.showToast(
-                    msg: 'Hết phiên đăng nhập',
-                    toastLength: Toast.LENGTH_SHORT,
-                    gravity: ToastGravity.CENTER);
-              } else
-                return Index();
-            }
-          } else {
-            return Login();
-          }
-          return Login();
-        },
-      ),
+      home: RepositoryProvider(
+          create: (context) => Repository(),
+          child: BlocProvider(
+            create: (context) => AuthCubit(),
+            child: AuthNavigator(),
+          )),
     );
-  }
-
-  Future<bool> get hasToken async {
-    var jwt = await UserSecureStorage.readAccessToken();
-    if (jwt == null) {
-      return false;
-    } else {
-      Jwt.updateToken(jwt);
-      return true;
-    }
   }
 }

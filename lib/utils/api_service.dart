@@ -8,31 +8,31 @@ import 'package:sosconnect/models/member.dart';
 import 'package:sosconnect/models/request.dart';
 import 'package:sosconnect/models/profile.dart';
 import 'package:sosconnect/models/support.dart';
-import 'package:sosconnect/utils/custom_exception.dart';
-import 'package:sosconnect/utils/jwt.dart';
 import 'package:sosconnect/utils/user_secure_storage.dart';
 
 class ApiService {
   ///1.1 Đăng kí
-  static Future<bool> register(String userName, String password) async {
+  Future<void> register(
+      String userName, String password, String confirmPassword) async {
     var uri = Uri.parse('https://sos-connect-auth.herokuapp.com/accounts/');
     var response = await http.post(uri,
         headers: {"Content-Type": "application/json"},
         body: jsonEncode(<String, String>{
           'username': userName,
           'password': password,
+          'password_confirmation': confirmPassword,
         }));
     if (response.statusCode == 200) {
-      return true;
+      return;
     } else if (response.statusCode == 400) {
-      throw CustomException("Tên đăng nhập đã tồn tại");
+      throw Exception("Tên đăng nhập đã tồn tại");
     } else {
-      throw CustomException("Đã xảy ra lỗi");
+      throw Exception("Đã xảy ra lỗi");
     }
   }
 
   ///1.3 Đăng nhập
-  static Future<bool> login(String userName, String password) async {
+  Future<void> login(String userName, String password) async {
     var uri =
         Uri.parse('https://sos-connect-auth.herokuapp.com/tokens/$userName/');
     var response = await http.post(uri,
@@ -43,17 +43,20 @@ class ApiService {
     if (response.statusCode == 200) {
       Map<String, dynamic> json = jsonDecode(response.body);
       String accessToken = json['accessToken'];
+      Map<String, dynamic> decodedToken = JwtDecoder.decode(accessToken);
       await UserSecureStorage.writeAccessToken(accessToken);
       String refreshToken = json['refreshToken'];
       await UserSecureStorage.writeRefreshToken(refreshToken);
-      return true;
+      await UserSecureStorage.writeUserName(decodedToken['username']);
+      return;
     } else {
-      throw CustomException("Đăng nhập không thành công");
+      throw Exception("Đăng nhập không thành công");
     }
   }
 
   ///1.4 Làm mới token
-  static Future<void> refresh(String userName) async {
+  Future<void> refresh() async {
+    var userName = await UserSecureStorage.readUserName();
     var uri =
         Uri.parse('https://sos-connect-auth.herokuapp.com/tokens/$userName/');
     var refreshToken = await UserSecureStorage.readRefreshToken();
@@ -66,14 +69,17 @@ class ApiService {
       Map<String, dynamic> json = jsonDecode(response.body);
       String accessToken = json['accessToken'];
       await UserSecureStorage.writeAccessToken(accessToken);
-      Jwt.updateToken(accessToken);
+      return;
+    } else {
+      throw Exception('Lỗi refresh token');
     }
   }
 
   ///1.5 Đăng xuất
-  static Future<bool> logout(String userName) async {
+  Future<bool> logout() async {
+    var userName = await UserSecureStorage.readUserName();
     var uri = Uri.https('sos-connect-auth.herokuapp.com', '/tokens/$userName/');
-    var accessToken = Jwt.accessToken;
+    var accessToken = await UserSecureStorage.readAccessToken();
     var response = await http.delete(
       uri,
       headers: {
@@ -84,28 +90,30 @@ class ApiService {
       await UserSecureStorage.deleteAccessToken();
       await UserSecureStorage.deleteRefreshToken();
       return true;
+    } else if (response.statusCode == 401) {
+      await refresh();
+      return logout();
     } else {
-      throw CustomException("Đã xảy ra lỗi");
+      throw Exception("Đã xảy ra lỗi");
     }
   }
 
   ///1.6 Xem thông tin group
-  static Future<Group?> group(int groupId) async {
+  Future<Group?> group(int groupId) async {
     var uri = Uri.https('sos-connect-api.herokuapp.com', '/groups/$groupId/');
     var response = await http.get(uri);
     if (response.statusCode == 200) {
       return Group.fromJson(jsonDecode(response.body));
     } else {
-      throw CustomException('Không tải được group');
+      throw Exception('Không tải được group');
     }
   }
 
   ///1.9 Người dùng tham gia group
-  static Future<bool> joinGroup(
-      int groupId, bool role, bool isAdminInvite) async {
+  Future<void> joinGroup(int groupId, bool role, bool isAdminInvite) async {
     var uri = Uri.parse(
         'https://sos-connect-api.herokuapp.com/groups/$groupId/users');
-    var accessToken = Jwt.accessToken;
+    var accessToken = await UserSecureStorage.readAccessToken();
     var response = await http.post(uri,
         headers: {
           "Content-Type": "application/json",
@@ -116,14 +124,17 @@ class ApiService {
           'is_admin_invited': isAdminInvite ? '1' : '0',
         }));
     if (response.statusCode == 200) {
-      return true;
+      return;
+    } else if (response.statusCode == 401) {
+      await refresh();
+      return joinGroup(groupId, role, isAdminInvite);
     } else {
-      throw CustomException("Đã xảy ra lỗi người dùng tham gia group");
+      throw Exception("Đã xảy ra lỗi người dùng tham gia group");
     }
   }
 
   ///1.10 Danh sách thành viên group
-  static Future<List<Member>> groupMembers(
+  Future<List<Member>> groupMembers(
       int groupId, String search, String field, String sort) async {
     Map<String, String> parameters = {
       'search': search,
@@ -137,12 +148,12 @@ class ApiService {
       var parsed = jsonDecode(response.body).cast<Map<String, dynamic>>();
       return parsed.map<Member>((json) => Member.fromJson(json)).toList();
     } else {
-      throw CustomException('Không tải được danh sách');
+      throw Exception('Không tải được danh sách');
     }
   }
 
   ///1.11 Danh sách group
-  static Future<List<Group>> groupList(
+  Future<List<Group>> groupList(
       String search, String field, String sort) async {
     Map<String, String> parameters = {
       'search': search,
@@ -156,12 +167,12 @@ class ApiService {
       var parsed = jsonDecode(response.body).cast<Map<String, dynamic>>();
       return parsed.map<Group>((json) => Group.fromJson(json)).toList();
     } else {
-      throw CustomException('Không tải được danh sách');
+      throw Exception('Không tải được danh sách');
     }
   }
 
   ///1.13 Xem yêu cầu hỗ trợ trong group
-  static Future<List<Request>> groupRequests(
+  Future<List<Request>> groupRequests(
       int groupId, String search, String field, String sort) async {
     Map<String, String> parameters = {
       'search': search,
@@ -175,15 +186,15 @@ class ApiService {
       var parsed = jsonDecode(response.body).cast<Map<String, dynamic>>();
       return parsed.map<Request>((json) => Request.fromJson(json)).toList();
     } else {
-      throw CustomException('Không tải được danh sách');
+      throw Exception('Không tải được danh sách');
     }
   }
 
   ///1.14 Tạo yêu cầu hỗ trợ
-  static Future<bool> addRequest(int groupId, String content) async {
+  Future<bool> addRequest(int groupId, String content) async {
     var uri = Uri.parse(
         'https://sos-connect-api.herokuapp.com/groups/$groupId/requests');
-    var accessToken = Jwt.accessToken;
+    var accessToken = await UserSecureStorage.readAccessToken();
     var response = await http.post(uri,
         headers: {
           "Content-Type": "application/json",
@@ -194,13 +205,16 @@ class ApiService {
         }));
     if (response.statusCode == 200) {
       return true;
+    } else if (response.statusCode == 401) {
+      await refresh();
+      return addRequest(groupId, content);
     } else {
-      throw CustomException("Đã xảy ra lỗi tạo yêu cầu hỗ trợ");
+      throw Exception("Đã xảy ra lỗi tạo yêu cầu hỗ trợ");
     }
   }
 
   ///1.16 Tạo profile
-  static Future<bool> addProfile(
+  Future<bool> addProfile(
       String lastName,
       String firstName,
       bool gender,
@@ -211,7 +225,7 @@ class ApiService {
       String ward,
       String street) async {
     var uri = Uri.parse('https://sos-connect-api.herokuapp.com/profiles');
-    var accessToken = Jwt.accessToken;
+    var accessToken = await UserSecureStorage.readAccessToken();
     var response = await http.post(uri,
         headers: {
           "Content-Type": "application/json",
@@ -230,24 +244,30 @@ class ApiService {
         }));
     if (response.statusCode == 200) {
       return true;
+    } else if (response.statusCode == 401) {
+      await refresh();
+      return addProfile(lastName, firstName, gender, dateOfBirth, country,
+          province, district, ward, street);
     } else {
-      throw CustomException("Đã xảy ra lỗi");
+      throw Exception("Đã xảy ra lỗi");
     }
   }
 
   ///1.17 Lấy profile
-  static Future<Profile?> profile(String userName) async {
+  Future<Profile?> profile() async {
+    var userName = await UserSecureStorage.readUserName();
     var uri =
         Uri.https('sos-connect-api.herokuapp.com', '/profiles/$userName/');
     var response = await http.get(uri);
     if (response.statusCode == 200) {
       return Profile.fromJson(jsonDecode(response.body));
     } else {
-      throw CustomException('Không tải được profile');
+      throw Exception('Không tải được profile');
     }
   }
 
-  static Future<bool> hasProfile(String userName) async {
+  Future<bool> hasProfile() async {
+    var userName = await UserSecureStorage.readUserName();
     var uri =
         Uri.https('sos-connect-api.herokuapp.com', '/profiles/$userName/');
     var response = await http.get(uri);
@@ -258,7 +278,7 @@ class ApiService {
   }
 
   ///1.18 Cập nhật profile
-  static Future<bool> updateProfile(
+  Future<bool> updateProfile(
       String lastName,
       String firstName,
       bool gender,
@@ -268,9 +288,8 @@ class ApiService {
       String district,
       String ward,
       String street) async {
-    var accessToken = Jwt.accessToken;
-    Map<String, dynamic> decodedToken = JwtDecoder.decode(accessToken);
-    var userName = decodedToken['username'];
+    var accessToken = await UserSecureStorage.readAccessToken();
+    var userName = await UserSecureStorage.readUserName();
     var uri =
         Uri.https('sos-connect-api.herokuapp.com', '/profiles/$userName/');
     var response = await http.put(uri,
@@ -291,29 +310,38 @@ class ApiService {
         }));
     if (response.statusCode == 200) {
       return true;
+    } else if (response.statusCode == 401) {
+      await refresh();
+      return updateProfile(lastName, firstName, gender, dateOfBirth, country,
+          province, district, ward, street);
     } else {
-      throw CustomException("Đã xảy ra lỗi");
+      throw Exception("Đã xảy ra lỗi");
     }
   }
 
   ///1.19 Xóa mềm profile
-  static Future<bool> deleteProfile(String userName) async {
+  Future<bool> deleteProfile() async {
+    var userName = await UserSecureStorage.readUserName();
     var uri = Uri.https(
         ' https://sos-connect-api.herokuapp.com', '/profiles/$userName');
-    var accessToken = Jwt.accessToken;
+    var accessToken = await UserSecureStorage.readAccessToken();
     var response = await http.delete(
       uri,
       headers: {HttpHeaders.authorizationHeader: 'Bearer $accessToken'},
     );
     if (response.statusCode == 200) {
       return true;
+    } else if (response.statusCode == 401) {
+      await refresh();
+      return deleteProfile();
     } else {
-      throw CustomException("Đã xảy ra lỗi không thể xóa mềm profile");
+      throw Exception("Đã xảy ra lỗi không thể xóa mềm profile");
     }
   }
 
   ///1.20 Xem các yêu cầu hỗ trợ của người dùng
-  static Future<List<Request>> memberRequests(String userName) async {
+  Future<List<Request>> memberRequests() async {
+    var userName = await UserSecureStorage.readUserName();
     var uri = Uri.https(
         'sos-connect-api.herokuapp.com', '/profiles/$userName/requests');
     var response = await http.get(uri);
@@ -321,24 +349,24 @@ class ApiService {
       var parsed = jsonDecode(response.body).cast<Map<String, dynamic>>();
       return parsed.map<Request>((json) => Request.fromJson(json)).toList();
     } else {
-      throw CustomException('Không tải được danh sách');
+      throw Exception('Không tải được danh sách');
     }
   }
 
   ///1.21 Xem yêu cầu hỗ trợ
-  static Future<Request?> request(int requestId) async {
+  Future<Request?> request(int requestId) async {
     var uri =
         Uri.https('sos-connect-api.herokuapp.com', '/requests/$requestId/');
     var response = await http.get(uri);
     if (response.statusCode == 200) {
       return Request.fromJson(jsonDecode(response.body));
     } else {
-      throw CustomException('Không tải được member');
+      throw Exception('Không tải được member');
     }
   }
 
   ///1.23 Xem danh sách hỗ trợ cho 1 yêu cầu hỗ trợ
-  static Future<List<Support>> requestSupports(
+  Future<List<Support>> requestSupports(
       int requestId, String search, String field, String sort) async {
     Map<String, String> parameters = {
       'search': search,
@@ -352,15 +380,15 @@ class ApiService {
       var parsed = jsonDecode(response.body).cast<Map<String, dynamic>>();
       return parsed.map<Support>((json) => Support.fromJson(json)).toList();
     } else {
-      throw CustomException('Không tải được danh sách');
+      throw Exception('Không tải được danh sách');
     }
   }
 
   ///1.24 Tạo hỗ trợ
-  static Future<bool> createSupport(int requestId, String content) async {
+  Future<bool> createSupport(int requestId, String content) async {
     var uri = Uri.parse(
         'https://sos-connect-api.herokuapp.com/requests/$requestId/supports');
-    var accessToken = Jwt.accessToken;
+    var accessToken = await UserSecureStorage.readAccessToken();
     var response = await http.post(uri,
         headers: {
           "Content-Type": "application/json",
@@ -371,16 +399,19 @@ class ApiService {
         }));
     if (response.statusCode == 200) {
       return true;
+    } else if (response.statusCode == 401) {
+      await refresh();
+      return createSupport(requestId, content);
     } else {
-      throw CustomException("Đã xảy ra lỗi tạo hỗ trợ");
+      throw Exception("Đã xảy ra lỗi tạo hỗ trợ");
     }
   }
 
   ///1.25 Chỉnh sửa yêu cầu hổ trợ
-  static Future<bool> updateRequest(int requestId, String content) async {
+  Future<bool> updateRequest(int requestId, String content) async {
     var uri = Uri.https(
         'https://sos-connect-api.herokuapp.com', '/groups/$requestId/requests');
-    var accessToken = Jwt.accessToken;
+    var accessToken = await UserSecureStorage.readAccessToken();
     var response = await http.put(uri,
         headers: {
           "Content-Type": "application/json",
@@ -391,32 +422,38 @@ class ApiService {
         }));
     if (response.statusCode == 200) {
       return true;
+    } else if (response.statusCode == 401) {
+      await refresh();
+      return updateRequest(requestId, content);
     } else {
-      throw CustomException("Đã xảy ra lỗi chỉnh sửa yêu cầu hỗ trợ");
+      throw Exception("Đã xảy ra lỗi chỉnh sửa yêu cầu hỗ trợ");
     }
   }
 
   ///1.26 Xóa mềm yêu cầu hổ trợ
-  static Future<bool> removeRequest(int requestId) async {
+  Future<bool> removeRequest(int requestId) async {
     var uri = Uri.https(
         'https://sos-connect-api.herokuapp.com', '/groups/$requestId/requests');
-    var accessToken = Jwt.accessToken;
+    var accessToken = await UserSecureStorage.readAccessToken();
     var response = await http.delete(
       uri,
       headers: {HttpHeaders.authorizationHeader: 'Bearer $accessToken'},
     );
     if (response.statusCode == 200) {
       return true;
+    } else if (response.statusCode == 401) {
+      await refresh();
+      return removeRequest(requestId);
     } else {
-      throw CustomException("Đã xảy ra lỗi không thể xóa mềm yêu cầu hỗ trợ");
+      throw Exception("Đã xảy ra lỗi không thể xóa mềm yêu cầu hỗ trợ");
     }
   }
 
   ///1.28 Người yêu cầu hỗ trợ xác nhận đã nhận hỗ trợ
-  static Future<bool> confirmSupport(int supportId, bool isConfirm) async {
+  Future<bool> confirmSupport(int supportId, bool isConfirm) async {
     var uri = Uri.https(
         'https://sos-connect-api.herokuapp.com', '/supports/$supportId');
-    var accessToken = Jwt.accessToken;
+    var accessToken = await UserSecureStorage.readAccessToken();
     var response = await http.put(uri,
         headers: {
           "Content-Type": "application/json",
@@ -427,16 +464,19 @@ class ApiService {
         }));
     if (response.statusCode == 200) {
       return true;
+    } else if (response.statusCode == 401) {
+      await refresh();
+      return confirmSupport(supportId, isConfirm);
     } else {
-      throw CustomException("Đã xảy ra lỗi không thể xác nhận đã nhận hỗ trợ");
+      throw Exception("Đã xảy ra lỗi không thể xác nhận đã nhận hỗ trợ");
     }
   }
 
   ///1.29 Người hỗ trợ chỉnh sửa nội dung hỗ trợ
-  static Future<bool> editSupport(int supportId, String content) async {
+  Future<bool> editSupport(int supportId, String content) async {
     var uri = Uri.https(
         'https://sos-connect-api.herokuapp.com', '/supports/$supportId');
-    var accessToken = Jwt.accessToken;
+    var accessToken = await UserSecureStorage.readAccessToken();
     var response = await http.put(uri,
         headers: {
           "Content-Type": "application/json",
@@ -447,24 +487,30 @@ class ApiService {
         }));
     if (response.statusCode == 200) {
       return true;
+    } else if (response.statusCode == 401) {
+      await refresh();
+      return editSupport(supportId, content);
     } else {
-      throw CustomException("Đã xảy ra lỗi chỉnh sửa nội dung hỗ trợ");
+      throw Exception("Đã xảy ra lỗi chỉnh sửa nội dung hỗ trợ");
     }
   }
 
   ///1.30 người hỗ trợ xóa mềm hỗ trợ
-  static Future<bool> removeSupport(int supportId) async {
+  Future<bool> removeSupport(int supportId) async {
     var uri = Uri.https(
         'https://sos-connect-api.herokuapp.com', '/supports/$supportId');
-    var accessToken = Jwt.accessToken;
+    var accessToken = await UserSecureStorage.readAccessToken();
     var response = await http.delete(
       uri,
       headers: {HttpHeaders.authorizationHeader: 'Bearer $accessToken'},
     );
     if (response.statusCode == 200) {
       return true;
+    } else if (response.statusCode == 401) {
+      await refresh();
+      return removeSupport(supportId);
     } else {
-      throw CustomException("Đã xảy ra lỗi không thể xóa mềm trong hỗ trợ");
+      throw Exception("Đã xảy ra lỗi không thể xóa mềm trong hỗ trợ");
     }
   }
 }
