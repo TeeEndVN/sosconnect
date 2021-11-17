@@ -29,20 +29,21 @@ class _LoginState extends State<Login> {
   }
 
   Widget _loginForm() {
-    return Padding(
+    return Form(
         key: _formKey,
-        padding: const EdgeInsets.symmetric(horizontal: 40),
-        child: SafeArea(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _userNameField(),
-              _passwordField(),
-              _loginButton(),
-              _showRegister()
-            ],
-          ),
-        ));
+        child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 40),
+            child: SafeArea(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _userNameField(),
+                  _passwordField(),
+                  _loginButton(),
+                  _showRegister()
+                ],
+              ),
+            )));
   }
 
   Widget _userNameField() {

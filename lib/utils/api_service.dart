@@ -14,7 +14,7 @@ class ApiService {
   ///1.1 Đăng kí
   Future<void> register(
       String userName, String password, String confirmPassword) async {
-    var uri = Uri.parse('https://sos-connect-auth.herokuapp.com/accounts/');
+    var uri = Uri.parse('https://sos-connect-auth.herokuapp.com/register/');
     var response = await http.post(uri,
         headers: {"Content-Type": "application/json"},
         body: jsonEncode(<String, String>{
@@ -33,11 +33,11 @@ class ApiService {
 
   ///1.3 Đăng nhập
   Future<void> login(String userName, String password) async {
-    var uri =
-        Uri.parse('https://sos-connect-auth.herokuapp.com/tokens/$userName/');
+    var uri = Uri.parse('https://sos-connect-auth.herokuapp.com/login/');
     var response = await http.post(uri,
         headers: {"Content-Type": "application/json"},
         body: jsonEncode(<String, String>{
+          'username': userName,
           'password': password,
         }));
     if (response.statusCode == 200) {
@@ -76,9 +76,8 @@ class ApiService {
   }
 
   ///1.5 Đăng xuất
-  Future<bool> logout() async {
-    var userName = await UserSecureStorage.readUserName();
-    var uri = Uri.https('sos-connect-auth.herokuapp.com', '/tokens/$userName/');
+  Future<void> logout() async {
+    var uri = Uri.parse('https://sos-connect-auth.herokuapp.com/logout/');
     var accessToken = await UserSecureStorage.readAccessToken();
     var response = await http.delete(
       uri,
@@ -89,7 +88,8 @@ class ApiService {
     if (response.statusCode == 200) {
       await UserSecureStorage.deleteAccessToken();
       await UserSecureStorage.deleteRefreshToken();
-      return true;
+      await UserSecureStorage.deleteUserName();
+      return;
     } else if (response.statusCode == 401) {
       await refresh();
       return logout();
@@ -191,7 +191,7 @@ class ApiService {
   }
 
   ///1.14 Tạo yêu cầu hỗ trợ
-  Future<bool> addRequest(int groupId, String content) async {
+  Future<void> addRequest(int groupId, String content) async {
     var uri = Uri.parse(
         'https://sos-connect-api.herokuapp.com/groups/$groupId/requests');
     var accessToken = await UserSecureStorage.readAccessToken();
@@ -204,7 +204,7 @@ class ApiService {
           'content': content,
         }));
     if (response.statusCode == 200) {
-      return true;
+      return;
     } else if (response.statusCode == 401) {
       await refresh();
       return addRequest(groupId, content);
@@ -214,7 +214,7 @@ class ApiService {
   }
 
   ///1.16 Tạo profile
-  Future<bool> addProfile(
+  Future<void> addProfile(
       String lastName,
       String firstName,
       bool gender,
@@ -243,7 +243,7 @@ class ApiService {
           'street': street,
         }));
     if (response.statusCode == 200) {
-      return true;
+      return;
     } else if (response.statusCode == 401) {
       await refresh();
       return addProfile(lastName, firstName, gender, dateOfBirth, country,
@@ -278,7 +278,7 @@ class ApiService {
   }
 
   ///1.18 Cập nhật profile
-  Future<bool> updateProfile(
+  Future<void> updateProfile(
       String lastName,
       String firstName,
       bool gender,
@@ -309,7 +309,7 @@ class ApiService {
           'street': street,
         }));
     if (response.statusCode == 200) {
-      return true;
+      return;
     } else if (response.statusCode == 401) {
       await refresh();
       return updateProfile(lastName, firstName, gender, dateOfBirth, country,
@@ -320,7 +320,7 @@ class ApiService {
   }
 
   ///1.19 Xóa mềm profile
-  Future<bool> deleteProfile() async {
+  Future<void> deleteProfile() async {
     var userName = await UserSecureStorage.readUserName();
     var uri = Uri.https(
         ' https://sos-connect-api.herokuapp.com', '/profiles/$userName');
@@ -330,7 +330,7 @@ class ApiService {
       headers: {HttpHeaders.authorizationHeader: 'Bearer $accessToken'},
     );
     if (response.statusCode == 200) {
-      return true;
+      return;
     } else if (response.statusCode == 401) {
       await refresh();
       return deleteProfile();
@@ -385,7 +385,7 @@ class ApiService {
   }
 
   ///1.24 Tạo hỗ trợ
-  Future<bool> createSupport(int requestId, String content) async {
+  Future<void> createSupport(int requestId, String content) async {
     var uri = Uri.parse(
         'https://sos-connect-api.herokuapp.com/requests/$requestId/supports');
     var accessToken = await UserSecureStorage.readAccessToken();
@@ -398,7 +398,7 @@ class ApiService {
           'content': content,
         }));
     if (response.statusCode == 200) {
-      return true;
+      return;
     } else if (response.statusCode == 401) {
       await refresh();
       return createSupport(requestId, content);
@@ -408,7 +408,7 @@ class ApiService {
   }
 
   ///1.25 Chỉnh sửa yêu cầu hổ trợ
-  Future<bool> updateRequest(int requestId, String content) async {
+  Future<void> updateRequest(int requestId, String content) async {
     var uri = Uri.https(
         'https://sos-connect-api.herokuapp.com', '/groups/$requestId/requests');
     var accessToken = await UserSecureStorage.readAccessToken();
@@ -421,7 +421,7 @@ class ApiService {
           'content': content,
         }));
     if (response.statusCode == 200) {
-      return true;
+      return;
     } else if (response.statusCode == 401) {
       await refresh();
       return updateRequest(requestId, content);
@@ -431,7 +431,7 @@ class ApiService {
   }
 
   ///1.26 Xóa mềm yêu cầu hổ trợ
-  Future<bool> removeRequest(int requestId) async {
+  Future<void> removeRequest(int requestId) async {
     var uri = Uri.https(
         'https://sos-connect-api.herokuapp.com', '/groups/$requestId/requests');
     var accessToken = await UserSecureStorage.readAccessToken();
@@ -440,7 +440,7 @@ class ApiService {
       headers: {HttpHeaders.authorizationHeader: 'Bearer $accessToken'},
     );
     if (response.statusCode == 200) {
-      return true;
+      return;
     } else if (response.statusCode == 401) {
       await refresh();
       return removeRequest(requestId);
@@ -450,7 +450,7 @@ class ApiService {
   }
 
   ///1.28 Người yêu cầu hỗ trợ xác nhận đã nhận hỗ trợ
-  Future<bool> confirmSupport(int supportId, bool isConfirm) async {
+  Future<void> confirmSupport(int supportId, bool isConfirm) async {
     var uri = Uri.https(
         'https://sos-connect-api.herokuapp.com', '/supports/$supportId');
     var accessToken = await UserSecureStorage.readAccessToken();
@@ -463,7 +463,7 @@ class ApiService {
           'is_confirmed': isConfirm ? '1' : '0',
         }));
     if (response.statusCode == 200) {
-      return true;
+      return;
     } else if (response.statusCode == 401) {
       await refresh();
       return confirmSupport(supportId, isConfirm);
@@ -473,7 +473,7 @@ class ApiService {
   }
 
   ///1.29 Người hỗ trợ chỉnh sửa nội dung hỗ trợ
-  Future<bool> editSupport(int supportId, String content) async {
+  Future<void> editSupport(int supportId, String content) async {
     var uri = Uri.https(
         'https://sos-connect-api.herokuapp.com', '/supports/$supportId');
     var accessToken = await UserSecureStorage.readAccessToken();
@@ -486,7 +486,7 @@ class ApiService {
           'content': content,
         }));
     if (response.statusCode == 200) {
-      return true;
+      return;
     } else if (response.statusCode == 401) {
       await refresh();
       return editSupport(supportId, content);
@@ -496,7 +496,7 @@ class ApiService {
   }
 
   ///1.30 người hỗ trợ xóa mềm hỗ trợ
-  Future<bool> removeSupport(int supportId) async {
+  Future<void> removeSupport(int supportId) async {
     var uri = Uri.https(
         'https://sos-connect-api.herokuapp.com', '/supports/$supportId');
     var accessToken = await UserSecureStorage.readAccessToken();
@@ -505,7 +505,7 @@ class ApiService {
       headers: {HttpHeaders.authorizationHeader: 'Bearer $accessToken'},
     );
     if (response.statusCode == 200) {
-      return true;
+      return;
     } else if (response.statusCode == 401) {
       await refresh();
       return removeSupport(supportId);

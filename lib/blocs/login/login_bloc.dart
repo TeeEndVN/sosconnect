@@ -23,6 +23,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       try {
         await repository.login(state.userName, state.password);
         yield state.copyWith(submissionStatus: Success());
+        authCubit.launchSession();
       } on Exception catch (e) {
         yield state.copyWith(submissionStatus: Failed(exception: e));
       }

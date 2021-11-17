@@ -17,7 +17,7 @@ class AppNavigator extends StatelessWidget {
           if (state is Unauthenticated)
             MaterialPage(
                 child: BlocProvider(
-              create: (context) => AuthCubit(),
+              create: (context) => AuthCubit(context.read<SessionCubit>()),
               child: AuthNavigator(),
             )),
           if (state is Authenticated) MaterialPage(child: Index())

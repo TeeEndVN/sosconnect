@@ -1,3 +1,7 @@
+import 'package:sosconnect/models/group.dart';
+import 'package:sosconnect/models/member.dart';
+import 'package:sosconnect/models/profile.dart';
+import 'package:sosconnect/models/request.dart';
 import 'package:sosconnect/utils/api_service.dart';
 
 class Repository {
@@ -14,19 +18,19 @@ class Repository {
 
   Future<void> logout() => apiService.logout();
 
-  Future<void> group(int groupId) => apiService.group(groupId);
+  Future<Group?> group(int groupId) => apiService.group(groupId);
 
   Future<void> joinGroup(int groupId, bool role, bool isAdminInvite) =>
       apiService.joinGroup(groupId, role, isAdminInvite);
 
-  Future<void> groupMembers(
+  Future<List<Member>> groupMembers(
           int groupId, String search, String field, String sort) =>
       apiService.groupMembers(groupId, search, field, sort);
 
-  Future<void> groupList(String search, String field, String sort) =>
+  Future<List<Group>> groupList(String search, String field, String sort) =>
       apiService.groupList(search, field, sort);
 
-  Future<void> groupRequests(
+  Future<List<Request>> groupRequests(
           int groupId, String search, String field, String sort) =>
       apiService.groupRequests(groupId, search, field, sort);
 
@@ -46,7 +50,7 @@ class Repository {
       apiService.addProfile(lastName, firstName, gender, dateOfBirth, country,
           province, district, ward, street);
 
-  Future<void> profile() => apiService.profile();
+  Future<Profile?> profile() => apiService.profile();
 
   Future<void> hasProfile() => apiService.hasProfile();
 
@@ -65,9 +69,9 @@ class Repository {
 
   Future<void> deleteProfile() => apiService.deleteProfile();
 
-  Future<void> memberRequests() => apiService.memberRequests();
+  Future<List<Request>> memberRequests() => apiService.memberRequests();
 
-  Future<void> request(int requestId) => apiService.request(requestId);
+  Future<Request?> request(int requestId) => apiService.request(requestId);
 
   Future<void> requestSupports(
           int requestId, String search, String field, String sort) =>

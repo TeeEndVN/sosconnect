@@ -26,6 +26,7 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
         await repository.register(
             state.userName, state.password, state.confirmPassword);
         yield state.copyWith(submissionStatus: Success());
+        authCubit.showLogin();
       } on Exception catch (e) {
         yield state.copyWith(submissionStatus: Failed(exception: e));
       }

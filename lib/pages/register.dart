@@ -29,21 +29,22 @@ class _RegisterState extends State<Register> {
   }
 
   Widget _registerForm() {
-    return Padding(
-      key: _formKey,
-      padding: const EdgeInsets.symmetric(horizontal: 40),
-      child: SafeArea(
-          child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          _userNameField(),
-          _passwordField(),
-          _confirmPasswordField(),
-          _registerButton(),
-          _showLogin()
-        ],
-      )),
-    );
+    return Form(
+        key: _formKey,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 40),
+          child: SafeArea(
+              child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _userNameField(),
+              _passwordField(),
+              _confirmPasswordField(),
+              _registerButton(),
+              _showLogin()
+            ],
+          )),
+        ));
   }
 
   Widget _userNameField() {
