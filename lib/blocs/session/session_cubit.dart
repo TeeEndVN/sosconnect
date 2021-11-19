@@ -1,11 +1,17 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:sosconnect/blocs/session/session_state.dart';
+import 'package:sosconnect/models/profile.dart';
 import 'package:sosconnect/utils/repository.dart';
 import 'package:sosconnect/utils/user_secure_storage.dart';
 
 class SessionCubit extends Cubit<SessionState> {
   final Repository repository;
+
+  Profile get currentProfile => (state as Authenticated).profile;
+  Profile? get selectedProfile => (state as Authenticated).selectedProfile;
+  bool get isCurrentProfileSelected =>
+      selectedProfile == null || selectedProfile == currentProfile;
 
   SessionCubit(this.repository) : super(UnknownSessionState()) {
     attemptAutoLogin();
@@ -20,12 +26,24 @@ class SessionCubit extends Cubit<SessionState> {
       if (JwtDecoder.isExpired(accessToken)) {
         try {
           repository.refresh();
+          var userName = await UserSecureStorage.readUserName();
+          Profile? profile = await repository.profile(userName);
+          if (profile == null) {
+            emit(AuthenticatedWithoutProfile());
+          } else {
+            emit(Authenticated(profile: profile));
+          }
         } on Exception {
           emit(Unauthenticated());
         }
       } else {
         var userName = await UserSecureStorage.readUserName();
-        emit(Authenticated(userName: userName));
+        Profile? profile = await repository.profile(userName);
+          if (profile == null) {
+            emit(AuthenticatedWithoutProfile());
+          } else {
+            emit(Authenticated(profile: profile));
+          }
       }
     }
   }
@@ -33,7 +51,12 @@ class SessionCubit extends Cubit<SessionState> {
   void showAuth() => emit(Unauthenticated());
   void showSession() async {
     var userName = await UserSecureStorage.readUserName();
-    emit(Authenticated(userName: userName));
+    Profile? profile = await repository.profile(userName);
+          if (profile == null) {
+            emit(AuthenticatedWithoutProfile());
+          } else {
+            emit(Authenticated(profile: profile));
+          }
   }
 
   void signOut() {

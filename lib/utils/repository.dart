@@ -41,7 +41,7 @@ class Repository {
           String lastName,
           String firstName,
           bool gender,
-          DateTime dateOfBirth,
+          String dateOfBirth,
           String country,
           String province,
           String district,
@@ -50,11 +50,10 @@ class Repository {
       apiService.addProfile(lastName, firstName, gender, dateOfBirth, country,
           province, district, ward, street);
 
-  Future<Profile?> profile() => apiService.profile();
-
-  Future<void> hasProfile() => apiService.hasProfile();
+  Future<Profile?> profile(dynamic userName) => apiService.profile(userName);
 
   Future<void> updateProfile(
+          dynamic userName,
           String lastName,
           String firstName,
           bool gender,
@@ -64,8 +63,8 @@ class Repository {
           String district,
           String ward,
           String street) =>
-      apiService.updateProfile(lastName, firstName, gender, dateOfBirth,
-          country, province, district, ward, street);
+      apiService.updateProfile(userName, lastName, firstName, gender,
+          dateOfBirth, country, province, district, ward, street);
 
   Future<void> deleteProfile() => apiService.deleteProfile();
 

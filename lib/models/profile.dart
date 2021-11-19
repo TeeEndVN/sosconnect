@@ -3,7 +3,7 @@ class Profile {
   final String lastName;
   final String firstName;
   final bool gender;
-  final DateTime dateOfBirth;
+  final String dateOfBirth;
   final String country;
   final String province;
   final String district;

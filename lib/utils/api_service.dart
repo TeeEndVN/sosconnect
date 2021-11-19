@@ -60,7 +60,7 @@ class ApiService {
     var uri =
         Uri.parse('https://sos-connect-auth.herokuapp.com/tokens/$userName/');
     var refreshToken = await UserSecureStorage.readRefreshToken();
-    var response = await http.post(uri,
+    var response = await http.put(uri,
         headers: {"Content-Type": "application/json"},
         body: jsonEncode(<String, String?>{
           'refreshToken': refreshToken,
@@ -218,7 +218,7 @@ class ApiService {
       String lastName,
       String firstName,
       bool gender,
-      DateTime dateOfBirth,
+      String dateOfBirth,
       String country,
       String province,
       String district,
@@ -231,11 +231,11 @@ class ApiService {
           "Content-Type": "application/json",
           HttpHeaders.authorizationHeader: 'Bearer $accessToken'
         },
-        body: jsonEncode(<String, String>{
+        body: jsonEncode(<String, dynamic>{
           'last_name': lastName,
           'first_name': firstName,
-          'gender': gender ? '1' : '0',
-          'date_of_birth': dateOfBirth.toIso8601String(),
+          'gender': gender,
+          'date_of_birth': dateOfBirth,
           'country': country,
           'province': province,
           'district': district,
@@ -254,31 +254,20 @@ class ApiService {
   }
 
   ///1.17 Lấy profile
-  Future<Profile?> profile() async {
-    var userName = await UserSecureStorage.readUserName();
+  Future<Profile?> profile(dynamic userName) async {
     var uri =
         Uri.https('sos-connect-api.herokuapp.com', '/profiles/$userName/');
     var response = await http.get(uri);
     if (response.statusCode == 200) {
       return Profile.fromJson(jsonDecode(response.body));
     } else {
-      throw Exception('Không tải được profile');
+      return null;
     }
-  }
-
-  Future<bool> hasProfile() async {
-    var userName = await UserSecureStorage.readUserName();
-    var uri =
-        Uri.https('sos-connect-api.herokuapp.com', '/profiles/$userName/');
-    var response = await http.get(uri);
-    if (response.statusCode == 400) {
-      return true;
-    }
-    return false;
   }
 
   ///1.18 Cập nhật profile
   Future<void> updateProfile(
+      dynamic userName,
       String lastName,
       String firstName,
       bool gender,
@@ -289,7 +278,6 @@ class ApiService {
       String ward,
       String street) async {
     var accessToken = await UserSecureStorage.readAccessToken();
-    var userName = await UserSecureStorage.readUserName();
     var uri =
         Uri.https('sos-connect-api.herokuapp.com', '/profiles/$userName/');
     var response = await http.put(uri,
@@ -312,8 +300,8 @@ class ApiService {
       return;
     } else if (response.statusCode == 401) {
       await refresh();
-      return updateProfile(lastName, firstName, gender, dateOfBirth, country,
-          province, district, ward, street);
+      return updateProfile(userName, lastName, firstName, gender, dateOfBirth,
+          country, province, district, ward, street);
     } else {
       throw Exception("Đã xảy ra lỗi");
     }

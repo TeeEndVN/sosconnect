@@ -4,6 +4,7 @@ import 'package:sosconnect/blocs/auth/auth_cubit.dart';
 import 'package:sosconnect/blocs/session/session_cubit.dart';
 import 'package:sosconnect/blocs/session/session_state.dart';
 import 'package:sosconnect/navigators/auth_navigator.dart';
+import 'package:sosconnect/pages/create_profile.dart';
 import 'package:sosconnect/pages/index.dart';
 import 'package:sosconnect/widgets/loading.dart';
 
@@ -20,7 +21,8 @@ class AppNavigator extends StatelessWidget {
               create: (context) => AuthCubit(context.read<SessionCubit>()),
               child: AuthNavigator(),
             )),
-          if (state is Authenticated) MaterialPage(child: Index())
+          if (state is Authenticated) MaterialPage(child: Index()),
+          if (state is AuthenticatedWithoutProfile) MaterialPage(child: CreateProfile())
         ],
         onPopPage: (route, result) => route.didPop(result),
       );
