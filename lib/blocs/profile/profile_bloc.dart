@@ -1,10 +1,16 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sosconnect/blocs/profile/profile_event.dart';
 import 'package:sosconnect/blocs/profile/profile_state.dart';
+import 'package:sosconnect/blocs/submission_status.dart';
 import 'package:sosconnect/models/profile.dart';
+import 'package:sosconnect/utils/repository.dart';
 
 class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
-  ProfileBloc({required Profile profile, required bool isCurrentUser})
+  final Repository repository;
+  ProfileBloc(
+      {required this.repository,
+      required Profile profile,
+      required bool isCurrentUser})
       : super(ProfileState(profile: profile, isCurrentUser: isCurrentUser));
 
   @override
@@ -27,6 +33,22 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       yield state.copyWith(ward: event.ward);
     } else if (event is ProfileStreetChanged) {
       yield state.copyWith(street: event.street);
-    } else if (event is SaveProfileChanges) {}
+    } else if (event is SaveProfileChanges) {
+      try {
+        await repository.updateProfile(
+            state.lastName,
+            state.firstName,
+            state.gender,
+            state.dateOfBirth,
+            state.country,
+            state.province,
+            state.district,
+            state.ward,
+            state.street);
+        yield state.copyWith(submissionStatus: Success());
+      } on Exception catch (e) {
+        yield state.copyWith(submissionStatus: Failed(exception: e));
+      }
+    }
   }
 }

@@ -53,18 +53,17 @@ class Repository {
   Future<Profile?> profile(dynamic userName) => apiService.profile(userName);
 
   Future<void> updateProfile(
-          dynamic userName,
           String lastName,
           String firstName,
           bool gender,
-          DateTime dateOfBirth,
+          String dateOfBirth,
           String country,
           String province,
           String district,
           String ward,
           String street) =>
-      apiService.updateProfile(userName, lastName, firstName, gender,
-          dateOfBirth, country, province, district, ward, street);
+      apiService.updateProfile(lastName, firstName, gender, dateOfBirth,
+          country, province, district, ward, street);
 
   Future<void> deleteProfile() => apiService.deleteProfile();
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sosconnect/widgets/profile_widget.dart';
 
 class Index extends StatefulWidget {
   Index({Key? key}) : super(key: key);
@@ -24,10 +25,7 @@ class _IndexState extends State<Index> {
       'Index 2: School',
       style: optionStyle,
     ),
-    Text(
-      'Index 3: Settings',
-      style: optionStyle,
-    ),
+    ProfileWidget(),
   ];
 
   void _onItemTapped(int index) {
@@ -39,12 +37,10 @@ class _IndexState extends State<Index> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('BottomNavigationBar Sample'),
-      ),
-      body: Center(
+      body: SafeArea(
+          child: Center(
         child: _widgetOptions.elementAt(_selectedIndex),
-      ),
+      )),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -63,8 +59,8 @@ class _IndexState extends State<Index> {
             backgroundColor: Colors.purple,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
+            icon: Icon(Icons.person),
+            label: 'Tài khoản',
             backgroundColor: Colors.pink,
           ),
         ],

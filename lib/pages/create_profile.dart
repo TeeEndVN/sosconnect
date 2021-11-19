@@ -148,12 +148,11 @@ class _CreateProfileState extends State<CreateProfile> {
             if (selectedDate != null) {
               _dateController.text =
                   DateFormat('yyyy-MM-dd').format(selectedDate);
+              context.read<CreateProfileBloc>().add(
+                  ProfileDateOfBirthChanged(dateOfBirth: _dateController.text));
             }
           });
         },
-        onChanged: (value) => context
-            .read<CreateProfileBloc>()
-            .add(ProfileDateOfBirthChanged(dateOfBirth: value)),
       );
     });
   }

@@ -79,7 +79,7 @@ class ApiService {
   Future<void> logout() async {
     var uri = Uri.parse('https://sos-connect-auth.herokuapp.com/logout/');
     var accessToken = await UserSecureStorage.readAccessToken();
-    var response = await http.delete(
+    var response = await http.get(
       uri,
       headers: {
         HttpHeaders.authorizationHeader: 'Bearer $accessToken',
@@ -267,16 +267,16 @@ class ApiService {
 
   ///1.18 Cập nhật profile
   Future<void> updateProfile(
-      dynamic userName,
       String lastName,
       String firstName,
       bool gender,
-      DateTime dateOfBirth,
+      String dateOfBirth,
       String country,
       String province,
       String district,
       String ward,
       String street) async {
+    var userName = await UserSecureStorage.readUserName();
     var accessToken = await UserSecureStorage.readAccessToken();
     var uri =
         Uri.https('sos-connect-api.herokuapp.com', '/profiles/$userName/');
@@ -285,11 +285,11 @@ class ApiService {
           "Content-Type": "application/json",
           HttpHeaders.authorizationHeader: 'Bearer $accessToken'
         },
-        body: jsonEncode(<String, String>{
+        body: jsonEncode(<String, dynamic>{
           'last_name': lastName,
           'first_name': firstName,
-          'gender': gender ? '1' : '0',
-          'date_of_birth': dateOfBirth.toIso8601String(),
+          'gender': gender,
+          'date_of_birth': dateOfBirth,
           'country': country,
           'province': province,
           'district': district,
@@ -300,8 +300,8 @@ class ApiService {
       return;
     } else if (response.statusCode == 401) {
       await refresh();
-      return updateProfile(userName, lastName, firstName, gender, dateOfBirth,
-          country, province, district, ward, street);
+      return updateProfile(lastName, firstName, gender, dateOfBirth, country,
+          province, district, ward, street);
     } else {
       throw Exception("Đã xảy ra lỗi");
     }
