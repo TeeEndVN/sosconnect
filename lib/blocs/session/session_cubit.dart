@@ -10,8 +10,12 @@ class SessionCubit extends Cubit<SessionState> {
 
   Profile get currentProfile => (state as Authenticated).profile;
   Profile? get selectedProfile => (state as Authenticated).selectedProfile;
+  set selectedProfile(Profile? profile) {
+    (state as Authenticated).selectedProfile = profile;
+  }
   bool get isCurrentProfileSelected =>
-      selectedProfile == null || selectedProfile == currentProfile;
+      selectedProfile == null ||
+      selectedProfile!.userName == currentProfile.userName;
 
   SessionCubit(this.repository) : super(UnknownSessionState()) {
     attemptAutoLogin();
@@ -39,11 +43,11 @@ class SessionCubit extends Cubit<SessionState> {
       } else {
         var userName = await UserSecureStorage.readUserName();
         Profile? profile = await repository.profile(userName);
-          if (profile == null) {
-            emit(AuthenticatedWithoutProfile());
-          } else {
-            emit(Authenticated(profile: profile));
-          }
+        if (profile == null) {
+          emit(AuthenticatedWithoutProfile());
+        } else {
+          emit(Authenticated(profile: profile));
+        }
       }
     }
   }
@@ -52,11 +56,11 @@ class SessionCubit extends Cubit<SessionState> {
   void showSession() async {
     var userName = await UserSecureStorage.readUserName();
     Profile? profile = await repository.profile(userName);
-          if (profile == null) {
-            emit(AuthenticatedWithoutProfile());
-          } else {
-            emit(Authenticated(profile: profile));
-          }
+    if (profile == null) {
+      emit(AuthenticatedWithoutProfile());
+    } else {
+      emit(Authenticated(profile: profile));
+    }
   }
 
   void signOut() {

@@ -3,7 +3,7 @@ class Group {
   final String description;
   final String name;
   final bool isDelete;
-  final DateTime dateCreate;
+  final String dateCreate;
 
   Group(
       {required this.groupId,

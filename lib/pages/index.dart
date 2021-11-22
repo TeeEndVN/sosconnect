@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sosconnect/widgets/profile_widget.dart';
+import 'package:sosconnect/widgets/search_widget.dart';
 
 class Index extends StatefulWidget {
   Index({Key? key}) : super(key: key);
@@ -17,10 +18,7 @@ class _IndexState extends State<Index> {
       'Index 0: Home',
       style: optionStyle,
     ),
-    Text(
-      'Index 1: Business',
-      style: optionStyle,
-    ),
+    SearchWidget(),
     Text(
       'Index 2: School',
       style: optionStyle,
@@ -44,28 +42,25 @@ class _IndexState extends State<Index> {
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-            backgroundColor: Colors.red,
-          ),
+              icon: Icon(Icons.home),
+              label: 'Home',
+              backgroundColor: Colors.lightBlue),
           BottomNavigationBarItem(
-            icon: Icon(Icons.business),
-            label: 'Business',
-            backgroundColor: Colors.green,
-          ),
+              icon: Icon(Icons.search),
+              label: 'Tìm kiếm',
+              backgroundColor: Colors.lightBlue),
           BottomNavigationBarItem(
-            icon: Icon(Icons.school),
-            label: 'School',
-            backgroundColor: Colors.purple,
-          ),
+              icon: Icon(Icons.school),
+              label: 'School',
+              backgroundColor: Colors.lightBlue),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Tài khoản',
-            backgroundColor: Colors.pink,
-          ),
+              icon: Icon(Icons.person),
+              label: 'Tài khoản',
+              backgroundColor: Colors.lightBlue),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.amber[800],
+        selectedItemColor: Colors.black,
+        unselectedItemColor: Colors.white,
         onTap: _onItemTapped,
       ),
     );
