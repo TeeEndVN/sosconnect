@@ -4,7 +4,7 @@ class Request {
   final String userName;
   final String content;
   final bool isDelete;
-  final DateTime dateCreate;
+  final String dateCreate;
   final bool isApprove;
 
   Request({

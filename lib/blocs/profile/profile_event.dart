@@ -1,5 +1,3 @@
-import 'package:sosconnect/models/profile.dart';
-
 abstract class ProfileEvent {}
 
 class ProfileLastNameChanged extends ProfileEvent {

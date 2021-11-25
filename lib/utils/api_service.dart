@@ -119,9 +119,9 @@ class ApiService {
           "Content-Type": "application/json",
           HttpHeaders.authorizationHeader: 'Bearer $accessToken'
         },
-        body: jsonEncode(<String, String>{
-          'as_role': role ? '1' : '0',
-          'is_admin_invited': isAdminInvite ? '1' : '0',
+        body: jsonEncode(<String, dynamic>{
+          'as_role': role,
+          'is_admin_invited': isAdminInvite,
         }));
     if (response.statusCode == 200) {
       return;
@@ -135,9 +135,9 @@ class ApiService {
 
   ///1.10 Danh sách thành viên group
   Future<List<Member>> groupMembers(
-      int groupId, String search, String field, String sort) async {
+      int groupId, String? search, String field, String sort) async {
     Map<String, String> parameters = {
-      'search': search,
+      'search': search ?? '',
       'field': field,
       'sort': sort,
     };
@@ -173,9 +173,9 @@ class ApiService {
 
   ///1.13 Xem yêu cầu hỗ trợ trong group
   Future<List<Request>> groupRequests(
-      int groupId, String search, String field, String sort) async {
+      int groupId, String? search, String field, String sort) async {
     Map<String, String> parameters = {
-      'search': search,
+      'search': search ?? '',
       'field': field,
       'sort': sort,
     };

@@ -24,14 +24,14 @@ class Repository {
       apiService.joinGroup(groupId, role, isAdminInvite);
 
   Future<List<Member>> groupMembers(
-          int groupId, String search, String field, String sort) =>
+          int groupId, String? search, String field, String sort) =>
       apiService.groupMembers(groupId, search, field, sort);
 
   Future<List<Group>> groupList(String search, String field, String sort) =>
       apiService.groupList(search, field, sort);
 
   Future<List<Request>> groupRequests(
-          int groupId, String search, String field, String sort) =>
+          int groupId, String? search, String field, String sort) =>
       apiService.groupRequests(groupId, search, field, sort);
 
   Future<void> addRequest(int groupId, String content) =>

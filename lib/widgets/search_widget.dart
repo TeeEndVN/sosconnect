@@ -6,6 +6,7 @@ import 'package:sosconnect/blocs/search/search_event.dart';
 import 'package:sosconnect/blocs/search/search_state.dart';
 import 'package:sosconnect/models/group.dart';
 import 'package:sosconnect/utils/repository.dart';
+import 'package:sosconnect/widgets/group_widget.dart';
 
 class SearchWidget extends StatefulWidget {
   const SearchWidget({Key? key}) : super(key: key);
@@ -97,16 +98,43 @@ class _SearchWidgetState extends State<SearchWidget> {
             itemBuilder: (BuildContext context, int index) {
               return Column(
                 children: [
-                  ListTile(
-                    onTap: () {},
-                    contentPadding: EdgeInsets.symmetric(horizontal: 25.0),
-                    title: Text(state.groups![index].name,
-                        style: TextStyle(fontWeight: FontWeight.bold)),
-                    subtitle: Text(
-                      state.groups![index].description,
+                  Material(
+                    elevation: 5.0,
+                    borderRadius: BorderRadius.circular(12.0),
+                    shadowColor: Colors.white,
+                    child: Container(
+                      padding: EdgeInsets.all(15.0),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12.0),
+                        color: Colors.white,
+                      ),
+                      constraints: BoxConstraints(minHeight: 100.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          ListTile(
+                            onTap: () {
+                              context.read<SearchBloc>().add(
+                                  SearchGroupSelected(
+                                      selectedGroup: state.groups![index]));
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => GroupWidget(
+                                          group: state.groups![index])));
+                            },
+                            contentPadding:
+                                EdgeInsets.symmetric(horizontal: 25.0),
+                            title: Text(state.groups![index].name,
+                                style: TextStyle(fontWeight: FontWeight.bold)),
+                            subtitle: Text(
+                              state.groups![index].description,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  Divider(),
                 ],
               );
             });

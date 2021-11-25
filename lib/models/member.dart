@@ -1,9 +1,9 @@
 class Member {
   final String userName;
   final int groupId;
-  final int role;
+  final bool role;
   final bool isAdminInvite;
-  final DateTime dateCreate;
+  final String dateCreate;
 
   Member({
     required this.userName,
@@ -15,7 +15,7 @@ class Member {
 
   factory Member.fromJson(Map<String, dynamic> json) {
     return Member(
-      userName: json['user_name'],
+      userName: json['username'],
       groupId: json['id_group'],
       role: json['as_role'],
       isAdminInvite: json['is_admin_invited'],
