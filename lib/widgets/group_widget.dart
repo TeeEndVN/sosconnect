@@ -5,6 +5,7 @@ import 'package:sosconnect/blocs/group/group_event.dart';
 import 'package:sosconnect/blocs/group/group_state.dart';
 import 'package:sosconnect/models/group.dart';
 import 'package:sosconnect/utils/repository.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class GroupWidget extends StatefulWidget {
   final Group? group;
@@ -15,6 +16,7 @@ class GroupWidget extends StatefulWidget {
 }
 
 class _GroupWidgetState extends State<GroupWidget> {
+  final _requestTextEditingController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -33,7 +35,121 @@ class _GroupWidgetState extends State<GroupWidget> {
     final appBarHeight = AppBar().preferredSize.height;
     return PreferredSize(
         preferredSize: Size.fromHeight(appBarHeight),
-        child: AppBar(title: const Text('Nhóm')));
+        child: BlocBuilder<GroupBloc, GroupState>(builder: (context, state) {
+          return AppBar(
+            title: const Text('Nhóm'),
+            actions: [
+              if (state.role == false)
+                IconButton(
+                  icon: const Icon(Icons.add),
+                  onPressed: () {
+                    final _provider = BlocProvider.of<GroupBloc>(context);
+                    showMaterialModalBottomSheet(
+                        context: context,
+                        useRootNavigator: false,
+                        builder: (context) => BlocProvider.value(
+                            value: _provider,
+                            child: SingleChildScrollView(
+                              controller: ModalScrollController.of(context),
+                              child: Padding(
+                                padding: EdgeInsets.only(
+                                    bottom: MediaQuery.of(context)
+                                        .viewInsets
+                                        .bottom),
+                                child: Container(
+                                    child: Column(
+                                  children: [
+                                    TextField(
+                                        controller:
+                                            _requestTextEditingController,
+                                        decoration: const InputDecoration(
+                                            hintText:
+                                                "Nhập nội dung cần hỗ trợ..."),
+                                        keyboardType: TextInputType.multiline,
+                                        maxLines: 5),
+                                    Row(
+                                      children: [
+                                        Container(
+                                          margin: EdgeInsets.only(
+                                              top: 10.0, bottom: 20.0),
+                                          height: 40.0,
+                                          width: 200.0,
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(7.0),
+                                            border:
+                                                Border.all(color: Colors.white),
+                                          ),
+                                          child: Material(
+                                            borderRadius:
+                                                BorderRadius.circular(7.0),
+                                            color: Colors.blue,
+                                            elevation: 10.0,
+                                            shadowColor: Colors.white70,
+                                            child: MaterialButton(
+                                              onPressed: () {
+                                                _provider.add(GroupPostSubmitted(
+                                                    groupId:
+                                                        state.group!.groupId,
+                                                    content:
+                                                        _requestTextEditingController
+                                                            .text));
+                                                Navigator.pop(context);
+                                              },
+                                              child: const Text(
+                                                'Đăng',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.w800,
+                                                  fontSize: 20.0,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        Container(
+                                          margin: EdgeInsets.only(
+                                              top: 10.0, bottom: 20.0),
+                                          height: 40.0,
+                                          width: 200.0,
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(7.0),
+                                            border:
+                                                Border.all(color: Colors.white),
+                                          ),
+                                          child: Material(
+                                            borderRadius:
+                                                BorderRadius.circular(7.0),
+                                            color: Colors.blue,
+                                            elevation: 10.0,
+                                            shadowColor: Colors.white70,
+                                            child: MaterialButton(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              child: const Text(
+                                                'Hủy',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.w800,
+                                                  fontSize: 20.0,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        )
+                                      ],
+                                    )
+                                  ],
+                                )),
+                              ),
+                            )));
+                  },
+                )
+            ],
+          );
+        }));
   }
 
   Widget _groupPage() {

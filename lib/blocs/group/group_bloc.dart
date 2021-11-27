@@ -27,11 +27,13 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
       if (state.role == false) {
         var userName = await UserSecureStorage.readUserName();
         List<Request>? requests = await repository.groupRequests(
-            state.group!.groupId, userName, '', '');
-        add(GroupRequestListReceived(requests: requests));
+            state.group!.groupId, '', 'date_created', 'desc');
+        List<Request>? _filteredList =
+            requests.where((i) => i.userName == userName).toList();
+        add(GroupRequestListReceived(requests: _filteredList));
       } else if (state.role == true) {
         List<Request>? requests =
-            await repository.groupRequests(state.group!.groupId, '', '', '');
+            await repository.groupRequests(state.group!.groupId, '', 'date_created', 'desc');
         add(GroupRequestListReceived(requests: requests));
       } else if (state.role == null) {
         add(GroupRequestListReceived(requests: null));
@@ -40,6 +42,9 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
       yield state.copyWith(requests: event.requests);
     } else if (event is GroupRequestSelected) {
       yield state.copyWith(selectedRequest: event.selectedRequest);
+    } else if (event is GroupPostSubmitted) {
+      await repository.addRequest(event.groupId, event.content);
+      add(GroupInitialized());
     } else if (event is GroupJoinSubmitted) {
       try {
         await repository.joinGroup(state.group!.groupId, state.role!, false);
