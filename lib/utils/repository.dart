@@ -2,6 +2,7 @@ import 'package:sosconnect/models/group.dart';
 import 'package:sosconnect/models/member.dart';
 import 'package:sosconnect/models/profile.dart';
 import 'package:sosconnect/models/request.dart';
+import 'package:sosconnect/models/support.dart';
 import 'package:sosconnect/utils/api_service.dart';
 
 class Repository {
@@ -71,7 +72,7 @@ class Repository {
 
   Future<Request?> request(int requestId) => apiService.request(requestId);
 
-  Future<void> requestSupports(
+  Future<List<Support>> requestSupports(
           int requestId, String search, String field, String sort) =>
       apiService.requestSupports(requestId, search, field, sort);
 

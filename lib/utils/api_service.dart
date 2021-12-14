@@ -22,7 +22,7 @@ class ApiService {
           'password': password,
           'password_confirmation': confirmPassword,
         }));
-    if (response.statusCode == 200) {
+    if (response.statusCode == 201) {
       return;
     } else if (response.statusCode == 400) {
       throw Exception("Tên đăng nhập đã tồn tại");
@@ -90,7 +90,7 @@ class ApiService {
       await UserSecureStorage.deleteRefreshToken();
       await UserSecureStorage.deleteUserName();
       return;
-    } else if (response.statusCode == 401) {
+    } else if (response.statusCode == 403) {
       await refresh();
       return logout();
     } else {
@@ -123,9 +123,9 @@ class ApiService {
           'as_role': role,
           'is_admin_invited': isAdminInvite,
         }));
-    if (response.statusCode == 200) {
+    if (response.statusCode == 201) {
       return;
-    } else if (response.statusCode == 401) {
+    } else if (response.statusCode == 403) {
       await refresh();
       return joinGroup(groupId, role, isAdminInvite);
     } else {
@@ -203,9 +203,9 @@ class ApiService {
         body: jsonEncode(<String, String>{
           'content': content,
         }));
-    if (response.statusCode == 200) {
+    if (response.statusCode == 201) {
       return;
-    } else if (response.statusCode == 401) {
+    } else if (response.statusCode == 403) {
       await refresh();
       return addRequest(groupId, content);
     } else {
@@ -242,9 +242,9 @@ class ApiService {
           'ward': ward,
           'street': street,
         }));
-    if (response.statusCode == 200) {
+    if (response.statusCode == 201) {
       return;
-    } else if (response.statusCode == 401) {
+    } else if (response.statusCode == 403) {
       await refresh();
       return addProfile(lastName, firstName, gender, dateOfBirth, country,
           province, district, ward, street);
@@ -298,7 +298,7 @@ class ApiService {
         }));
     if (response.statusCode == 200) {
       return;
-    } else if (response.statusCode == 401) {
+    } else if (response.statusCode == 403) {
       await refresh();
       return updateProfile(lastName, firstName, gender, dateOfBirth, country,
           province, district, ward, street);
@@ -319,7 +319,7 @@ class ApiService {
     );
     if (response.statusCode == 200) {
       return;
-    } else if (response.statusCode == 401) {
+    } else if (response.statusCode == 403) {
       await refresh();
       return deleteProfile();
     } else {
@@ -385,9 +385,9 @@ class ApiService {
         body: jsonEncode(<String, String>{
           'content': content,
         }));
-    if (response.statusCode == 200) {
+    if (response.statusCode == 201) {
       return;
-    } else if (response.statusCode == 401) {
+    } else if (response.statusCode == 403) {
       await refresh();
       return createSupport(requestId, content);
     } else {
@@ -397,8 +397,8 @@ class ApiService {
 
   ///1.25 Chỉnh sửa yêu cầu hổ trợ
   Future<void> updateRequest(int requestId, String content) async {
-    var uri = Uri.https(
-        'https://sos-connect-api.herokuapp.com', '/groups/$requestId/requests');
+    var uri =
+        Uri.https('sos-connect-api.herokuapp.com', '/requests/$requestId');
     var accessToken = await UserSecureStorage.readAccessToken();
     var response = await http.put(uri,
         headers: {
@@ -410,7 +410,7 @@ class ApiService {
         }));
     if (response.statusCode == 200) {
       return;
-    } else if (response.statusCode == 401) {
+    } else if (response.statusCode == 403) {
       await refresh();
       return updateRequest(requestId, content);
     } else {
@@ -420,8 +420,8 @@ class ApiService {
 
   ///1.26 Xóa mềm yêu cầu hổ trợ
   Future<void> removeRequest(int requestId) async {
-    var uri = Uri.https(
-        'https://sos-connect-api.herokuapp.com', '/groups/$requestId/requests');
+    var uri =
+        Uri.https('sos-connect-api.herokuapp.com', '/requests/$requestId');
     var accessToken = await UserSecureStorage.readAccessToken();
     var response = await http.delete(
       uri,
@@ -429,7 +429,7 @@ class ApiService {
     );
     if (response.statusCode == 200) {
       return;
-    } else if (response.statusCode == 401) {
+    } else if (response.statusCode == 403) {
       await refresh();
       return removeRequest(requestId);
     } else {
@@ -447,12 +447,12 @@ class ApiService {
           "Content-Type": "application/json",
           HttpHeaders.authorizationHeader: 'Bearer $accessToken'
         },
-        body: jsonEncode(<String, String>{
-          'is_confirmed': isConfirm ? '1' : '0',
+        body: jsonEncode(<String, dynamic>{
+          'is_confirmed': isConfirm,
         }));
     if (response.statusCode == 200) {
       return;
-    } else if (response.statusCode == 401) {
+    } else if (response.statusCode == 403) {
       await refresh();
       return confirmSupport(supportId, isConfirm);
     } else {
@@ -462,8 +462,8 @@ class ApiService {
 
   ///1.29 Người hỗ trợ chỉnh sửa nội dung hỗ trợ
   Future<void> editSupport(int supportId, String content) async {
-    var uri = Uri.https(
-        'https://sos-connect-api.herokuapp.com', '/supports/$supportId');
+    var uri =
+        Uri.https('sos-connect-api.herokuapp.com', '/supports/$supportId');
     var accessToken = await UserSecureStorage.readAccessToken();
     var response = await http.put(uri,
         headers: {
@@ -475,7 +475,7 @@ class ApiService {
         }));
     if (response.statusCode == 200) {
       return;
-    } else if (response.statusCode == 401) {
+    } else if (response.statusCode == 403) {
       await refresh();
       return editSupport(supportId, content);
     } else {
@@ -485,8 +485,8 @@ class ApiService {
 
   ///1.30 người hỗ trợ xóa mềm hỗ trợ
   Future<void> removeSupport(int supportId) async {
-    var uri = Uri.https(
-        'https://sos-connect-api.herokuapp.com', '/supports/$supportId');
+    var uri =
+        Uri.https('sos-connect-api.herokuapp.com', '/supports/$supportId');
     var accessToken = await UserSecureStorage.readAccessToken();
     var response = await http.delete(
       uri,
@@ -494,7 +494,7 @@ class ApiService {
     );
     if (response.statusCode == 200) {
       return;
-    } else if (response.statusCode == 401) {
+    } else if (response.statusCode == 403) {
       await refresh();
       return removeSupport(supportId);
     } else {
