@@ -22,6 +22,8 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
     if (event is GroupInitialized) {
       bool? role = await getRole();
       add(GroupRoleChanged(role: role));
+      var userName = await UserSecureStorage.readUserName();
+      yield state.copyWith(currentUser: userName);
     } else if (event is GroupRoleChanged) {
       yield state.copyWith(role: event.role);
       if (state.role == false) {
@@ -32,8 +34,10 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
             requests.where((i) => i.userName == userName).toList();
         add(GroupRequestListReceived(requests: _filteredList));
       } else if (state.role == true) {
-        List<Request>? requests =
-            await repository.groupRequests(state.group!.groupId, '', 'date_created', 'desc');
+        List<Request>? requests = await repository.groupRequests(
+            state.group!.groupId, '', 'date_created', 'desc');
+        List<Request>? _filteredList =
+            requests.where((i) => i.isApprove == true).toList();
         add(GroupRequestListReceived(requests: requests));
       } else if (state.role == null) {
         add(GroupRequestListReceived(requests: null));
@@ -45,12 +49,24 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
     } else if (event is GroupPostSubmitted) {
       await repository.addRequest(event.groupId, event.content);
       add(GroupInitialized());
+    } else if (event is GroupPostUpdated) {
+      await repository.updateRequest(event.requestId, event.content);
+      add(GroupInitialized());
     } else if (event is GroupJoinSubmitted) {
       try {
         await repository.joinGroup(state.group!.groupId, state.role!, false);
         yield state.copyWith(submissionStatus: Success());
       } on Exception catch (e) {
         yield state.copyWith(submissionStatus: Failed(exception: e));
+      }
+    } else if (event is GroupPostDeleted) {
+      try {
+        await repository.removeRequest(state.selectedRequest!.requestId);
+        add(GroupInitialized());
+        yield state.copyWith(submissionStatus: Success());
+      } on Exception catch (e) {
+        yield state.copyWith(submissionStatus: Failed(exception: e));
+        print(e);
       }
     }
   }

@@ -25,4 +25,12 @@ class GroupPostSubmitted extends GroupEvent {
   GroupPostSubmitted({required this.groupId, required this.content});
 }
 
+class GroupPostUpdated extends GroupEvent {
+  final int requestId;
+  final String content;
+  GroupPostUpdated({required this.requestId, required this.content});
+}
+
 class GroupJoinSubmitted extends GroupEvent {}
+
+class GroupPostDeleted extends GroupEvent{}
