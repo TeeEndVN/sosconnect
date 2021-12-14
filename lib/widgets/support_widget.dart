@@ -135,15 +135,15 @@ class _SupportWidgetState extends State<SupportWidget> {
                       Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 8),
                           child: Row(children: [
-                            GestureDetector(
-                              onTap: () {
-                               
-                              },
-                              child: const Text(
-                                'Xác nhận',
-                                style: TextStyle(fontWeight: FontWeight.w700),
+                            if (widget.currentUser == widget.request!.userName)
+                              GestureDetector(
+                                onTap: () {},
+                                child: const Text(
+                                  'Xác nhận',
+                                  style: TextStyle(fontWeight: FontWeight.w700),
+                                ),
                               ),
-                            ),const SizedBox(
+                            const SizedBox(
                               width: 10.0,
                             ),
                             if (widget.currentUser ==
@@ -372,7 +372,7 @@ class _SupportWidgetState extends State<SupportWidget> {
     );
   }
 
-   Widget _confirmDialog(BuildContext context) {
+  Widget _confirmDialog(BuildContext context) {
     return AlertDialog(
       title: const Text('Xác nhận'),
       content: const Text('Bạn có muốn xác nhận yêu cầu hỗ trợ này'),
@@ -382,8 +382,7 @@ class _SupportWidgetState extends State<SupportWidget> {
           child: const Text('Hủy'),
         ),
         TextButton(
-          onPressed: () {
-          },
+          onPressed: () {},
           child: const Text('Đồng ý'),
         ),
       ],
