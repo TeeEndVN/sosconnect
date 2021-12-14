@@ -4,7 +4,7 @@ class Support {
   final String username;
   final String content;
   final bool isConfirm;
-  final DateTime dateCreate;
+  final String dateCreate;
 
   Support(
       {required this.supportId,
@@ -14,7 +14,7 @@ class Support {
       required this.isConfirm,
       required this.dateCreate});
 
-   factory Support.fromJson(Map<String, dynamic> json) {
+  factory Support.fromJson(Map<String, dynamic> json) {
     return Support(
       supportId: json['id_support'],
       requestId: json['id_request'],
@@ -23,5 +23,5 @@ class Support {
       isConfirm: json['is_confirmed'],
       dateCreate: json['date_created'],
     );
-  }   
+  }
 }

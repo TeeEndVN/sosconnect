@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sosconnect/widgets/profile_widget.dart';
 import 'package:sosconnect/widgets/search_widget.dart';
+import 'package:sosconnect/widgets/user_request_widget.dart';
 
 class Index extends StatefulWidget {
   Index({Key? key}) : super(key: key);
@@ -14,15 +15,8 @@ class _IndexState extends State<Index> {
   static const TextStyle optionStyle =
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   static const List<Widget> _widgetOptions = <Widget>[
-    Text(
-      'Index 0: Home',
-      style: optionStyle,
-    ),
+    UserRequestWidget(),
     SearchWidget(),
-    Text(
-      'Index 2: School',
-      style: optionStyle,
-    ),
     ProfileWidget(),
   ];
 
@@ -43,15 +37,11 @@ class _IndexState extends State<Index> {
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
               icon: Icon(Icons.home),
-              label: 'Home',
+              label: 'Trang chủ',
               backgroundColor: Colors.lightBlue),
           BottomNavigationBarItem(
               icon: Icon(Icons.search),
               label: 'Tìm kiếm',
-              backgroundColor: Colors.lightBlue),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.school),
-              label: 'School',
               backgroundColor: Colors.lightBlue),
           BottomNavigationBarItem(
               icon: Icon(Icons.person),
@@ -59,6 +49,7 @@ class _IndexState extends State<Index> {
               backgroundColor: Colors.lightBlue),
         ],
         currentIndex: _selectedIndex,
+        backgroundColor: Colors.lightBlue,
         selectedItemColor: Colors.black,
         unselectedItemColor: Colors.white,
         onTap: _onItemTapped,

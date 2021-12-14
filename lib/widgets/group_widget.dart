@@ -6,6 +6,7 @@ import 'package:sosconnect/blocs/group/group_state.dart';
 import 'package:sosconnect/models/group.dart';
 import 'package:sosconnect/utils/repository.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:sosconnect/widgets/support_widget.dart';
 
 class GroupWidget extends StatefulWidget {
   final Group? group;
@@ -94,6 +95,8 @@ class _GroupWidgetState extends State<GroupWidget> {
                                                     content:
                                                         _requestTextEditingController
                                                             .text));
+                                                _requestTextEditingController
+                                                    .clear();
                                                 Navigator.pop(context);
                                               },
                                               child: const Text(
@@ -126,6 +129,8 @@ class _GroupWidgetState extends State<GroupWidget> {
                                             shadowColor: Colors.white70,
                                             child: MaterialButton(
                                               onPressed: () {
+                                                _requestTextEditingController
+                                                    .clear();
                                                 Navigator.pop(context);
                                               },
                                               child: const Text(
@@ -145,6 +150,7 @@ class _GroupWidgetState extends State<GroupWidget> {
                                 )),
                               ),
                             )));
+                    _requestTextEditingController.clear();
                   },
                 )
             ],
@@ -341,7 +347,12 @@ class _GroupWidgetState extends State<GroupWidget> {
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
                                 ),
-                              ))
+                              )),
+                          Spacer(),
+                          Icon(Icons.verified,
+                              color: state.requests![index].isApprove
+                                  ? Colors.green
+                                  : Colors.grey),
                         ],
                       ),
                       const SizedBox(
@@ -354,16 +365,201 @@ class _GroupWidgetState extends State<GroupWidget> {
                         ),
                         child: Text(state.requests![index].content),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        child: GestureDetector(
-                          onTap: () {},
-                          child: const Text(
-                            'Xem các hỗ trợ',
-                            style: TextStyle(fontWeight: FontWeight.w300),
-                          ),
-                        ),
+                      const SizedBox(
+                        height: 10.0,
                       ),
+                      Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          child: Row(children: [
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => SupportWidget(
+                                            currentUser: state.currentUser!,
+                                            request: state.requests![index])));
+                              },
+                              child: const Text(
+                                'Xem các hỗ trợ',
+                                style: TextStyle(fontWeight: FontWeight.w700),
+                              ),
+                            ),
+                            const SizedBox(
+                              width: 10.0,
+                            ),
+                            if (state.currentUser ==
+                                state.requests![index].userName)
+                              GestureDetector(
+                                onTap: () {
+                                  final _provider =
+                                      BlocProvider.of<GroupBloc>(context);
+                                  _requestTextEditingController.text =
+                                      state.requests![index].content;
+                                  showMaterialModalBottomSheet(
+                                      context: context,
+                                      useRootNavigator: false,
+                                      builder: (context) => BlocProvider.value(
+                                          value: _provider,
+                                          child: SingleChildScrollView(
+                                            controller:
+                                                ModalScrollController.of(
+                                                    context),
+                                            child: Padding(
+                                              padding: EdgeInsets.only(
+                                                  bottom: MediaQuery.of(context)
+                                                      .viewInsets
+                                                      .bottom),
+                                              child: Container(
+                                                  child: Column(
+                                                children: [
+                                                  TextField(
+                                                      controller:
+                                                          _requestTextEditingController,
+                                                      decoration:
+                                                          const InputDecoration(
+                                                              hintText:
+                                                                  "Nhập nội dung thay đổi..."),
+                                                      keyboardType:
+                                                          TextInputType
+                                                              .multiline,
+                                                      maxLines: 5),
+                                                  Row(
+                                                    children: [
+                                                      Container(
+                                                        margin: EdgeInsets.only(
+                                                            top: 10.0,
+                                                            bottom: 20.0),
+                                                        height: 40.0,
+                                                        width: 200.0,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      7.0),
+                                                          border: Border.all(
+                                                              color:
+                                                                  Colors.white),
+                                                        ),
+                                                        child: Material(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      7.0),
+                                                          color: Colors.blue,
+                                                          elevation: 10.0,
+                                                          shadowColor:
+                                                              Colors.white70,
+                                                          child: MaterialButton(
+                                                            onPressed: () {
+                                                              _provider.add(GroupPostUpdated(
+                                                                  requestId: state
+                                                                      .requests![
+                                                                          index]
+                                                                      .requestId,
+                                                                  content:
+                                                                      _requestTextEditingController
+                                                                          .text));
+                                                              _requestTextEditingController
+                                                                  .clear();
+                                                              Navigator.pop(
+                                                                  context);
+                                                            },
+                                                            child: const Text(
+                                                              'Cập nhật',
+                                                              style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w800,
+                                                                fontSize: 20.0,
+                                                                color: Colors
+                                                                    .white,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Container(
+                                                        margin: EdgeInsets.only(
+                                                            top: 10.0,
+                                                            bottom: 20.0),
+                                                        height: 40.0,
+                                                        width: 200.0,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      7.0),
+                                                          border: Border.all(
+                                                              color:
+                                                                  Colors.white),
+                                                        ),
+                                                        child: Material(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      7.0),
+                                                          color: Colors.blue,
+                                                          elevation: 10.0,
+                                                          shadowColor:
+                                                              Colors.white70,
+                                                          child: MaterialButton(
+                                                            onPressed: () {
+                                                              _requestTextEditingController
+                                                                  .clear();
+                                                              Navigator.pop(
+                                                                  context);
+                                                            },
+                                                            child: const Text(
+                                                              'Hủy',
+                                                              style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w800,
+                                                                fontSize: 20.0,
+                                                                color: Colors
+                                                                    .white,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      )
+                                                    ],
+                                                  )
+                                                ],
+                                              )),
+                                            ),
+                                          )));
+                                },
+                                child: const Text(
+                                  'Sửa',
+                                  style: TextStyle(fontWeight: FontWeight.w700),
+                                ),
+                              ),
+                            const SizedBox(
+                              width: 10.0,
+                            ),
+                            if (state.currentUser ==
+                                state.requests![index].userName)
+                              GestureDetector(
+                                onTap: () {
+                                  context.read<GroupBloc>().add(
+                                      GroupRequestSelected(
+                                          selectedRequest:
+                                              state.requests![index]));
+                                  showDialog(
+                                      context: context,
+                                      useRootNavigator: false,
+                                      builder: (_) => _deleteDialog(context));
+                                },
+                                child: const Text(
+                                  'Xóa',
+                                  style: TextStyle(fontWeight: FontWeight.w700),
+                                ),
+                              ),
+                          ])),
                     ],
                   ),
                 ),
@@ -404,6 +600,27 @@ class _GroupWidgetState extends State<GroupWidget> {
           onTap: () {
             Navigator.pop(context);
           },
+        ),
+      ],
+    );
+  }
+
+  Widget _deleteDialog(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Xác nhận xóa'),
+      content: const Text('Bạn có muốn xóa yêu cầu hỗ trợ này'),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Hủy'),
+        ),
+        TextButton(
+          onPressed: () {
+            context.read<GroupBloc>().add(GroupPostDeleted());
+            print('ok');
+            Navigator.pop(context);
+          },
+          child: const Text('Đồng ý'),
         ),
       ],
     );
