@@ -7,6 +7,7 @@ import 'package:sosconnect/models/group.dart';
 import 'package:sosconnect/utils/repository.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:sosconnect/widgets/group_user_widget.dart';
+import 'package:sosconnect/widgets/member_profile_widget.dart';
 import 'package:sosconnect/widgets/support_widget.dart';
 
 class GroupWidget extends StatefulWidget {
@@ -351,7 +352,16 @@ class _GroupWidgetState extends State<GroupWidget> {
                             horizontal: 5,
                           )),
                           GestureDetector(
-                              onTap: () {},
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            MemberProfileWidget(
+                                              userName: state
+                                                  .requests![index].userName,
+                                            )));
+                              },
                               child: Text(
                                 state.requests![index].userName,
                                 style: const TextStyle(
