@@ -137,7 +137,7 @@ class _SupportWidgetState extends State<SupportWidget> {
                           child: Row(children: [
                             if ((widget.currentUser ==
                                     widget.request!.userName) &&
-                                (state.supports![index].isConfirm == true))
+                                (state.supports![index].isConfirm == false))
                               GestureDetector(
                                 onTap: () {
                                   context.read<SupportBloc>().add(
@@ -156,7 +156,7 @@ class _SupportWidgetState extends State<SupportWidget> {
                               ),
                             if ((widget.currentUser ==
                                     widget.request!.userName) &&
-                                (state.supports![index].isConfirm == true))
+                                (state.supports![index].isConfirm == false))
                               const SizedBox(
                                 width: 10.0,
                               ),
