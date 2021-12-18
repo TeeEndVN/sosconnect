@@ -33,6 +33,10 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       yield state.copyWith(ward: event.ward);
     } else if (event is ProfileStreetChanged) {
       yield state.copyWith(street: event.street);
+    } else if (event is ProfileEmailChanged) {
+      yield state.copyWith(email: event.email);
+    } else if (event is ProfilePhoneNumberChanged) {
+      yield state.copyWith(phoneNumber: event.phoneNumber);
     } else if (event is SaveProfileChanges) {
       try {
         await repository.updateProfile(
@@ -44,7 +48,9 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
             state.province,
             state.district,
             state.ward,
-            state.street);
+            state.street,
+            state.email,
+            state.phoneNumber);
         yield state.copyWith(submissionStatus: Success());
       } on Exception catch (e) {
         yield state.copyWith(submissionStatus: Failed(exception: e));

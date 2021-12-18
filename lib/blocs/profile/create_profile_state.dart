@@ -11,21 +11,25 @@ class CreateProfileState {
   final String district;
   final String ward;
   final String street;
+  final String email;
+  final String phoneNumber;
 
   final SubmissionStatus submissionStatus;
 
   CreateProfileState({
     this.lastName = '',
     this.firstName = '',
-    this.gender = false,
-    String? dateOfBirth,
+    this.gender = true,
+    this.dateOfBirth = '',
     this.country = '',
     this.province = '',
     this.district = '',
     this.ward = '',
     this.street = '',
+    this.email = '',
+    this.phoneNumber = '',
     this.submissionStatus = const InitialStatus(),
-  }) : dateOfBirth = DateFormat('yyyy-MM-dd').format(DateTime.now());
+  });
 
   CreateProfileState copyWith(
       {String? lastName,
@@ -37,6 +41,8 @@ class CreateProfileState {
       String? district,
       String? ward,
       String? street,
+      String? email,
+      String? phoneNumber,
       SubmissionStatus? submissionStatus}) {
     return CreateProfileState(
         lastName: lastName ?? this.lastName,
@@ -48,6 +54,8 @@ class CreateProfileState {
         district: district ?? this.district,
         ward: ward ?? this.ward,
         street: street ?? this.street,
+        email: email ?? this.email,
+        phoneNumber: phoneNumber ?? this.phoneNumber,
         submissionStatus: submissionStatus ?? this.submissionStatus);
   }
 }

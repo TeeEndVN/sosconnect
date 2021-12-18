@@ -13,6 +13,8 @@ class ProfileState {
   final String district;
   final String ward;
   final String street;
+  final String email;
+  final String phoneNumber;
 
   String get userName => profile.userName;
   final SubmissionStatus submissionStatus;
@@ -29,6 +31,8 @@ class ProfileState {
     String? district,
     String? ward,
     String? street,
+    String? email,
+    String? phoneNumber,
     this.submissionStatus = const InitialStatus(),
   })  : lastName = lastName ?? profile.lastName,
         firstName = firstName ?? profile.firstName,
@@ -38,7 +42,9 @@ class ProfileState {
         province = province ?? profile.province,
         district = district ?? profile.district,
         ward = ward ?? profile.ward,
-        street = street ?? profile.street;
+        street = street ?? profile.street,
+        email = email ?? profile.email,
+        phoneNumber = phoneNumber ?? profile.phoneNumber;
 
   ProfileState copyWith(
       {Profile? profile,
@@ -52,6 +58,8 @@ class ProfileState {
       String? district,
       String? ward,
       String? street,
+      String? email,
+      String? phoneNumber,
       SubmissionStatus? submissionStatus}) {
     return ProfileState(
         profile: profile ?? this.profile,
@@ -65,6 +73,8 @@ class ProfileState {
         district: district ?? this.district,
         ward: ward ?? this.ward,
         street: street ?? this.street,
+        email: email ?? this.email,
+        phoneNumber: phoneNumber ?? this.phoneNumber,
         submissionStatus: submissionStatus ?? this.submissionStatus);
   }
 }

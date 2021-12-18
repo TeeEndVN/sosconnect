@@ -10,6 +10,10 @@ class SessionCubit extends Cubit<SessionState> {
 
   Profile get currentProfile => (state as Authenticated).profile;
   Profile? get selectedProfile => (state as Authenticated).selectedProfile;
+  set currentProfile(Profile profile) {
+    (state as Authenticated).profile = profile;
+  }
+
   set selectedProfile(Profile? profile) {
     (state as Authenticated).selectedProfile = profile;
   }
@@ -51,6 +55,12 @@ class SessionCubit extends Cubit<SessionState> {
         }
       }
     }
+  }
+
+  void refreshProfile() async {
+    var userName = await UserSecureStorage.readUserName();
+    Profile? profile = await repository.profile(userName);
+    currentProfile = profile!;
   }
 
   void showAuth() => emit(Unauthenticated());

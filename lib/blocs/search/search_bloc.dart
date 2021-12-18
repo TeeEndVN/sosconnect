@@ -7,11 +7,23 @@ import 'package:sosconnect/utils/repository.dart';
 
 class SearchBloc extends Bloc<SearchEvent, SearchState> {
   final Repository repository;
-  SearchBloc({required this.repository}) : super(SearchState());
+  SearchBloc({required this.repository}) : super(SearchState()) {
+    add(SearchInitialized());
+  }
 
   @override
   Stream<SearchState> mapEventToState(SearchEvent event) async* {
-    if (event is SearchQueryChanged) {
+    if (event is SearchInitialized) {
+      yield state.copyWith(submissionStatus: Submitting());
+
+      try {
+        List<Group>? groups = await repository.groupList('', '', '');
+        add(SearchGroupListReceived(groups: groups));
+        yield state.copyWith(submissionStatus: Success());
+      } on Exception catch (e) {
+        yield state.copyWith(submissionStatus: Failed(exception: e));
+      }
+    } else if (event is SearchQueryChanged) {
       yield state.copyWith(query: event.query);
     } else if (event is SearchGroupListReceived) {
       yield state.copyWith(groups: event.groups);

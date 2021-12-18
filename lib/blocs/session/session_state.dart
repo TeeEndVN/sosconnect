@@ -9,7 +9,7 @@ class Unauthenticated extends SessionState {}
 class AuthenticatedWithoutProfile extends SessionState {}
 
 class Authenticated extends SessionState {
-  final Profile profile;
+  Profile profile;
   Profile? selectedProfile;
   Authenticated({required this.profile});
 }

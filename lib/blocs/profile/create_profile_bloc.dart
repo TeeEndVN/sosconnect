@@ -31,6 +31,10 @@ class CreateProfileBloc extends Bloc<ProfileEvent, CreateProfileState> {
       yield state.copyWith(ward: event.ward);
     } else if (event is ProfileStreetChanged) {
       yield state.copyWith(street: event.street);
+    } else if (event is ProfileEmailChanged) {
+      yield state.copyWith(email: event.email);
+    } else if (event is ProfilePhoneNumberChanged) {
+      yield state.copyWith(phoneNumber: event.phoneNumber);
     } else if (event is SaveProfileChanges) {
       yield state.copyWith(submissionStatus: Submitting());
       try {
@@ -43,7 +47,9 @@ class CreateProfileBloc extends Bloc<ProfileEvent, CreateProfileState> {
             state.province,
             state.district,
             state.ward,
-            state.street);
+            state.street,
+            state.email,
+            state.phoneNumber);
         yield state.copyWith(submissionStatus: Success());
         sessionCubit.showSession();
       } on Exception catch (e) {

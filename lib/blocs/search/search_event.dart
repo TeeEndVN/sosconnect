@@ -2,6 +2,8 @@ import 'package:sosconnect/models/group.dart';
 
 abstract class SearchEvent {}
 
+class SearchInitialized extends SearchEvent {}
+
 class SearchQueryChanged extends SearchEvent {
   final String query;
   SearchQueryChanged({required this.query});

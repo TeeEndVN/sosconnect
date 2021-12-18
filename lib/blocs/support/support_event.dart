@@ -25,4 +25,6 @@ class SupportUpdated extends SupportEvent {
   SupportUpdated({required this.supportId, required this.content});
 }
 
-class SupportDeleted extends SupportEvent{}
+class SupportDeleted extends SupportEvent {}
+
+class SupportConfirmed extends SupportEvent {}

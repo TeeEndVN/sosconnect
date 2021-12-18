@@ -52,6 +52,15 @@ class SupportBloc extends Bloc<SupportEvent, SupportState> {
         yield state.copyWith(submissionStatus: Failed(exception: e));
         print(e);
       }
+    } else if (event is SupportConfirmed) {
+      try {
+        await repository.confirmSupport(state.selectedSupport!.supportId, true);
+        add(SupportInitialized());
+        yield state.copyWith(submissionStatus: Success());
+      } on Exception catch (e) {
+        yield state.copyWith(submissionStatus: Failed(exception: e));
+        print(e);
+      }
     }
   }
 }

@@ -45,4 +45,14 @@ class ProfileStreetChanged extends ProfileEvent {
   ProfileStreetChanged({required this.street});
 }
 
+class ProfileEmailChanged extends ProfileEvent {
+  final String email;
+  ProfileEmailChanged({required this.email});
+}
+
+class ProfilePhoneNumberChanged extends ProfileEvent {
+  final String phoneNumber;
+  ProfilePhoneNumberChanged({required this.phoneNumber});
+}
+
 class SaveProfileChanges extends ProfileEvent {}
