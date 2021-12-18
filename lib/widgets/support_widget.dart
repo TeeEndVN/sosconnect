@@ -135,17 +135,31 @@ class _SupportWidgetState extends State<SupportWidget> {
                       Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 8),
                           child: Row(children: [
-                            if (widget.currentUser == widget.request!.userName)
+                            if ((widget.currentUser ==
+                                    widget.request!.userName) &&
+                                (state.supports![index].isConfirm == true))
                               GestureDetector(
-                                onTap: () {},
+                                onTap: () {
+                                  context.read<SupportBloc>().add(
+                                      SupportSelected(
+                                          selectedSupport:
+                                              state.supports![index]));
+                                  showDialog(
+                                      context: context,
+                                      useRootNavigator: false,
+                                      builder: (_) => _confirmDialog(context));
+                                },
                                 child: const Text(
                                   'Xác nhận',
                                   style: TextStyle(fontWeight: FontWeight.w700),
                                 ),
                               ),
-                            const SizedBox(
-                              width: 10.0,
-                            ),
+                            if ((widget.currentUser ==
+                                    widget.request!.userName) &&
+                                (state.supports![index].isConfirm == true))
+                              const SizedBox(
+                                width: 10.0,
+                              ),
                             if (widget.currentUser ==
                                 state.supports![index].username)
                               GestureDetector(
@@ -382,7 +396,11 @@ class _SupportWidgetState extends State<SupportWidget> {
           child: const Text('Hủy'),
         ),
         TextButton(
-          onPressed: () {},
+          onPressed: () {
+            context.read<SupportBloc>().add(SupportConfirmed());
+            print('ok');
+            Navigator.pop(context);
+          },
           child: const Text('Đồng ý'),
         ),
       ],

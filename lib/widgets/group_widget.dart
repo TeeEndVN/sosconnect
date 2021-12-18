@@ -6,6 +6,7 @@ import 'package:sosconnect/blocs/group/group_state.dart';
 import 'package:sosconnect/models/group.dart';
 import 'package:sosconnect/utils/repository.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:sosconnect/widgets/group_user_widget.dart';
 import 'package:sosconnect/widgets/support_widget.dart';
 
 class GroupWidget extends StatefulWidget {
@@ -40,6 +41,16 @@ class _GroupWidgetState extends State<GroupWidget> {
           return AppBar(
             title: const Text('Nhóm'),
             actions: [
+              IconButton(
+                  icon: const Icon(Icons.people),
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => GroupUserWidget(
+                                  group: widget.group,
+                                )));
+                  }),
               if (state.role == false)
                 IconButton(
                   icon: const Icon(Icons.add),

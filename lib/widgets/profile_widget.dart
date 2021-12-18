@@ -5,6 +5,7 @@ import 'package:sosconnect/blocs/profile/profile_bloc.dart';
 import 'package:sosconnect/blocs/profile/profile_event.dart';
 import 'package:sosconnect/blocs/profile/profile_state.dart';
 import 'package:sosconnect/blocs/session/session_cubit.dart';
+import 'package:sosconnect/blocs/submission_status.dart';
 import 'package:sosconnect/utils/repository.dart';
 
 class ProfileWidget extends StatefulWidget {
@@ -20,6 +21,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
   @override
   Widget build(BuildContext context) {
     final sessionCubit = context.read<SessionCubit>();
+    sessionCubit.refreshProfile();
     return BlocProvider(
       create: (context) => ProfileBloc(
         repository: context.read<Repository>(),
@@ -76,6 +78,8 @@ class _ProfileWidgetState extends State<ProfileWidget> {
               _districtTile(),
               _wardTile(),
               _streetTile(),
+              _emailTile(),
+              _phoneNumberTile(),
               if (state.isCurrentUser) _saveProfileChangesButton(),
             ],
           ),
@@ -88,7 +92,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
     return BlocBuilder<ProfileBloc, ProfileState>(builder: (context, state) {
       return CircleAvatar(
         radius: 50,
-        child: Icon(Icons.person),
+        backgroundImage: NetworkImage(state.profile.avatarUrl),
       );
     });
   }
@@ -370,14 +374,70 @@ class _ProfileWidgetState extends State<ProfileWidget> {
     });
   }
 
+  Widget _emailTile() {
+    return BlocBuilder<ProfileBloc, ProfileState>(builder: (context, state) {
+      return ListTile(
+        tileColor: Colors.white,
+        leading: Icon(Icons.mail),
+        title: TextFormField(
+          initialValue: state.email,
+          decoration: const InputDecoration(
+            filled: true,
+            labelText: 'Email',
+          ),
+          maxLines: null,
+          readOnly: !state.isCurrentUser,
+          toolbarOptions: ToolbarOptions(
+            copy: state.isCurrentUser,
+            cut: state.isCurrentUser,
+            paste: state.isCurrentUser,
+            selectAll: state.isCurrentUser,
+          ),
+          onChanged: (value) => context
+              .read<ProfileBloc>()
+              .add(ProfileEmailChanged(email: value)),
+        ),
+      );
+    });
+  }
+
+  Widget _phoneNumberTile() {
+    return BlocBuilder<ProfileBloc, ProfileState>(builder: (context, state) {
+      return ListTile(
+        tileColor: Colors.white,
+        leading: Icon(Icons.phone),
+        title: TextFormField(
+          initialValue: state.phoneNumber,
+          decoration: const InputDecoration(
+            filled: true,
+            labelText: 'Số điện thoại',
+          ),
+          maxLines: null,
+          readOnly: !state.isCurrentUser,
+          toolbarOptions: ToolbarOptions(
+            copy: state.isCurrentUser,
+            cut: state.isCurrentUser,
+            paste: state.isCurrentUser,
+            selectAll: state.isCurrentUser,
+          ),
+          onChanged: (value) => context
+              .read<ProfileBloc>()
+              .add(ProfilePhoneNumberChanged(phoneNumber: value)),
+        ),
+      );
+    });
+  }
+
   Widget _saveProfileChangesButton() {
     return BlocBuilder<ProfileBloc, ProfileState>(builder: (context, state) {
-      return ElevatedButton(
-        onPressed: () {
-          context.read<ProfileBloc>().add(SaveProfileChanges());
-        },
-        child: Text('Lưu thông tin'),
-      );
+      return state.submissionStatus is Submitting
+          ? const CircularProgressIndicator()
+          : ElevatedButton(
+              onPressed: () {
+                context.read<ProfileBloc>().add(SaveProfileChanges());
+              },
+              child: const Text('Lưu thông tin'),
+            );
     });
   }
 }

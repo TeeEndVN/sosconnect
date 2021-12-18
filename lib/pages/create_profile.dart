@@ -51,6 +51,8 @@ class _CreateProfileState extends State<CreateProfile> {
                       _districtField(),
                       _wardField(),
                       _streetField(),
+                      _emailField(),
+                      _phoneNumberField(),
                       _createButton(),
                     ],
                   ),
@@ -238,6 +240,40 @@ class _CreateProfileState extends State<CreateProfile> {
         onChanged: (value) => context
             .read<CreateProfileBloc>()
             .add(ProfileStreetChanged(street: value)),
+      );
+    });
+  }
+
+  Widget _emailField() {
+    return BlocBuilder<CreateProfileBloc, CreateProfileState>(
+        builder: (context, state) {
+      return TextFormField(
+        autofocus: true,
+        textInputAction: TextInputAction.next,
+        decoration: const InputDecoration(
+          filled: true,
+          labelText: 'Email',
+        ),
+        onChanged: (value) => context
+            .read<CreateProfileBloc>()
+            .add(ProfileEmailChanged(email: value)),
+      );
+    });
+  }
+
+  Widget _phoneNumberField() {
+    return BlocBuilder<CreateProfileBloc, CreateProfileState>(
+        builder: (context, state) {
+      return TextFormField(
+        autofocus: true,
+        textInputAction: TextInputAction.next,
+        decoration: const InputDecoration(
+          filled: true,
+          labelText: 'Số điện thoại',
+        ),
+        onChanged: (value) => context
+            .read<CreateProfileBloc>()
+            .add(ProfilePhoneNumberChanged(phoneNumber: value)),
       );
     });
   }
