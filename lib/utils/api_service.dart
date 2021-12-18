@@ -111,7 +111,7 @@ class ApiService {
   ///1.9 Người dùng tham gia group
   Future<void> joinGroup(int groupId, bool role, bool isAdminInvite) async {
     var uri =
-        Uri.parse('http://api.sos-connect.asia/apip/groups/$groupId/users');
+        Uri.parse('http://api.sos-connect.asia/api/groups/$groupId/users');
     var accessToken = await UserSecureStorage.readAccessToken();
     var response = await http.post(uri,
         headers: {
@@ -221,7 +221,9 @@ class ApiService {
       String province,
       String district,
       String ward,
-      String street) async {
+      String street,
+      String email,
+      String phoneNumber) async {
     var uri = Uri.parse('http://api.sos-connect.asia/api/profiles');
     var accessToken = await UserSecureStorage.readAccessToken();
     var response = await http.post(uri,
@@ -239,13 +241,15 @@ class ApiService {
           'district': district,
           'ward': ward,
           'street': street,
+          'email': email,
+          'phone_number': phoneNumber
         }));
     if (response.statusCode == 201) {
       return;
     } else if (response.statusCode == 403) {
       await refresh();
       return addProfile(lastName, firstName, gender, dateOfBirth, country,
-          province, district, ward, street);
+          province, district, ward, street, email, phoneNumber);
     } else {
       throw Exception("Đã xảy ra lỗi");
     }
@@ -272,10 +276,12 @@ class ApiService {
       String province,
       String district,
       String ward,
-      String street) async {
+      String street,
+      String email,
+      String phoneNumber) async {
     var userName = await UserSecureStorage.readUserName();
     var accessToken = await UserSecureStorage.readAccessToken();
-    var uri = Uri.https('api.sos-connect.asia', 'api/profiles/$userName/');
+    var uri = Uri.http('api.sos-connect.asia', 'api/profiles/$userName/');
     var response = await http.put(uri,
         headers: {
           "Content-Type": "application/json",
@@ -291,13 +297,15 @@ class ApiService {
           'district': district,
           'ward': ward,
           'street': street,
+          'email': email,
+          'phone_number': phoneNumber
         }));
     if (response.statusCode == 200) {
       return;
     } else if (response.statusCode == 403) {
       await refresh();
       return updateProfile(lastName, firstName, gender, dateOfBirth, country,
-          province, district, ward, street);
+          province, district, ward, street, email, phoneNumber);
     } else {
       throw Exception("Đã xảy ra lỗi");
     }
@@ -453,7 +461,7 @@ class ApiService {
 
   ///1.29 Người hỗ trợ chỉnh sửa nội dung hỗ trợ
   Future<void> editSupport(int supportId, String content) async {
-    var uri = Uri.https('api.sos-connect.asia', 'api/supports/$supportId');
+    var uri = Uri.http('api.sos-connect.asia', 'api/supports/$supportId');
     var accessToken = await UserSecureStorage.readAccessToken();
     var response = await http.put(uri,
         headers: {
@@ -475,7 +483,7 @@ class ApiService {
 
   ///1.30 người hỗ trợ xóa mềm hỗ trợ
   Future<void> removeSupport(int supportId) async {
-    var uri = Uri.https('api.sos-connect.asia', 'api/supports/$supportId');
+    var uri = Uri.http('api.sos-connect.asia', 'api/supports/$supportId');
     var accessToken = await UserSecureStorage.readAccessToken();
     var response = await http.delete(
       uri,

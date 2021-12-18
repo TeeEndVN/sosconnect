@@ -47,9 +47,11 @@ class Repository {
           String province,
           String district,
           String ward,
-          String street) =>
+          String street,
+          String email,
+          String phoneNumber) =>
       apiService.addProfile(lastName, firstName, gender, dateOfBirth, country,
-          province, district, ward, street);
+          province, district, ward, street, email, phoneNumber);
 
   Future<Profile?> profile(dynamic userName) => apiService.profile(userName);
 
@@ -62,9 +64,11 @@ class Repository {
           String province,
           String district,
           String ward,
-          String street) =>
+          String street,
+          String email,
+          String phoneNumber) =>
       apiService.updateProfile(lastName, firstName, gender, dateOfBirth,
-          country, province, district, ward, street);
+          country, province, district, ward, street, email, phoneNumber);
 
   Future<void> deleteProfile() => apiService.deleteProfile();
 
