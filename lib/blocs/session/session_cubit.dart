@@ -13,6 +13,7 @@ class SessionCubit extends Cubit<SessionState> {
   set selectedProfile(Profile? profile) {
     (state as Authenticated).selectedProfile = profile;
   }
+
   bool get isCurrentProfileSelected =>
       selectedProfile == null ||
       selectedProfile!.userName == currentProfile.userName;
@@ -63,8 +64,8 @@ class SessionCubit extends Cubit<SessionState> {
     }
   }
 
-  void signOut() {
-    repository.logout();
+  void signOut() async {
+    await repository.logout();
     emit(Unauthenticated());
   }
 }

@@ -14,7 +14,7 @@ class ApiService {
   ///1.1 Đăng kí
   Future<void> register(
       String userName, String password, String confirmPassword) async {
-    var uri = Uri.parse('https://sos-connect-auth.herokuapp.com/register/');
+    var uri = Uri.parse('http://api.sos-connect.asia/auth/register');
     var response = await http.post(uri,
         headers: {"Content-Type": "application/json"},
         body: jsonEncode(<String, String>{
@@ -33,7 +33,7 @@ class ApiService {
 
   ///1.3 Đăng nhập
   Future<void> login(String userName, String password) async {
-    var uri = Uri.parse('https://sos-connect-auth.herokuapp.com/login/');
+    var uri = Uri.parse('http://api.sos-connect.asia/auth/login');
     var response = await http.post(uri,
         headers: {"Content-Type": "application/json"},
         body: jsonEncode(<String, String>{
@@ -57,8 +57,7 @@ class ApiService {
   ///1.4 Làm mới token
   Future<void> refresh() async {
     var userName = await UserSecureStorage.readUserName();
-    var uri =
-        Uri.parse('https://sos-connect-auth.herokuapp.com/tokens/$userName/');
+    var uri = Uri.parse('http://api.sos-connect.asia/auth/tokens/$userName/');
     var refreshToken = await UserSecureStorage.readRefreshToken();
     var response = await http.put(uri,
         headers: {"Content-Type": "application/json"},
@@ -77,7 +76,7 @@ class ApiService {
 
   ///1.5 Đăng xuất
   Future<void> logout() async {
-    var uri = Uri.parse('https://sos-connect-auth.herokuapp.com/logout/');
+    var uri = Uri.parse('http://api.sos-connect.asia/auth/logout/');
     var accessToken = await UserSecureStorage.readAccessToken();
     var response = await http.get(
       uri,
@@ -100,7 +99,7 @@ class ApiService {
 
   ///1.6 Xem thông tin group
   Future<Group?> group(int groupId) async {
-    var uri = Uri.https('sos-connect-api.herokuapp.com', '/groups/$groupId/');
+    var uri = Uri.http('api.sos-connect.asia', '/api/groups/$groupId/');
     var response = await http.get(uri);
     if (response.statusCode == 200) {
       return Group.fromJson(jsonDecode(response.body));
@@ -111,8 +110,8 @@ class ApiService {
 
   ///1.9 Người dùng tham gia group
   Future<void> joinGroup(int groupId, bool role, bool isAdminInvite) async {
-    var uri = Uri.parse(
-        'https://sos-connect-api.herokuapp.com/groups/$groupId/users');
+    var uri =
+        Uri.parse('http://api.sos-connect.asia/apip/groups/$groupId/users');
     var accessToken = await UserSecureStorage.readAccessToken();
     var response = await http.post(uri,
         headers: {
@@ -141,8 +140,8 @@ class ApiService {
       'field': field,
       'sort': sort,
     };
-    var uri = Uri.https(
-        'sos-connect-api.herokuapp.com', '/groups/$groupId/users', parameters);
+    var uri = Uri.http(
+        'api.sos-connect.asia', 'api/groups/$groupId/users', parameters);
     var response = await http.get(uri);
     if (response.statusCode == 200) {
       var parsed = jsonDecode(response.body).cast<Map<String, dynamic>>();
@@ -160,8 +159,7 @@ class ApiService {
       'field': field,
       'sort': sort,
     };
-    var uri =
-        Uri.https('sos-connect-api.herokuapp.com', '/groups/', parameters);
+    var uri = Uri.http('api.sos-connect.asia', 'api/groups/', parameters);
     var response = await http.get(uri);
     if (response.statusCode == 200) {
       var parsed = jsonDecode(response.body).cast<Map<String, dynamic>>();
@@ -179,8 +177,8 @@ class ApiService {
       'field': field,
       'sort': sort,
     };
-    var uri = Uri.https('sos-connect-api.herokuapp.com',
-        '/groups/$groupId/requests', parameters);
+    var uri = Uri.http(
+        'api.sos-connect.asia', 'api/groups/$groupId/requests', parameters);
     var response = await http.get(uri);
     if (response.statusCode == 200) {
       var parsed = jsonDecode(response.body).cast<Map<String, dynamic>>();
@@ -192,8 +190,8 @@ class ApiService {
 
   ///1.14 Tạo yêu cầu hỗ trợ
   Future<void> addRequest(int groupId, String content) async {
-    var uri = Uri.parse(
-        'https://sos-connect-api.herokuapp.com/groups/$groupId/requests');
+    var uri =
+        Uri.parse('http://api.sos-connect.asia/api/groups/$groupId/requests');
     var accessToken = await UserSecureStorage.readAccessToken();
     var response = await http.post(uri,
         headers: {
@@ -224,7 +222,7 @@ class ApiService {
       String district,
       String ward,
       String street) async {
-    var uri = Uri.parse('https://sos-connect-api.herokuapp.com/profiles');
+    var uri = Uri.parse('http://api.sos-connect.asia/api/profiles');
     var accessToken = await UserSecureStorage.readAccessToken();
     var response = await http.post(uri,
         headers: {
@@ -255,8 +253,7 @@ class ApiService {
 
   ///1.17 Lấy profile
   Future<Profile?> profile(dynamic userName) async {
-    var uri =
-        Uri.https('sos-connect-api.herokuapp.com', '/profiles/$userName/');
+    var uri = Uri.http('api.sos-connect.asia', 'api/profiles/$userName/');
     var response = await http.get(uri);
     if (response.statusCode == 200) {
       return Profile.fromJson(jsonDecode(response.body));
@@ -278,8 +275,7 @@ class ApiService {
       String street) async {
     var userName = await UserSecureStorage.readUserName();
     var accessToken = await UserSecureStorage.readAccessToken();
-    var uri =
-        Uri.https('sos-connect-api.herokuapp.com', '/profiles/$userName/');
+    var uri = Uri.https('api.sos-connect.asia', 'api/profiles/$userName/');
     var response = await http.put(uri,
         headers: {
           "Content-Type": "application/json",
@@ -310,8 +306,7 @@ class ApiService {
   ///1.19 Xóa mềm profile
   Future<void> deleteProfile() async {
     var userName = await UserSecureStorage.readUserName();
-    var uri = Uri.https(
-        ' https://sos-connect-api.herokuapp.com', '/profiles/$userName');
+    var uri = Uri.http('api.sos-connect.asia', 'api/profiles/$userName');
     var accessToken = await UserSecureStorage.readAccessToken();
     var response = await http.delete(
       uri,
@@ -330,8 +325,8 @@ class ApiService {
   ///1.20 Xem các yêu cầu hỗ trợ của người dùng
   Future<List<Request>> memberRequests() async {
     var userName = await UserSecureStorage.readUserName();
-    var uri = Uri.https(
-        'sos-connect-api.herokuapp.com', '/profiles/$userName/requests');
+    var uri =
+        Uri.http('api.sos-connect.asia', 'api/profiles/$userName/requests');
     var response = await http.get(uri);
     if (response.statusCode == 200) {
       var parsed = jsonDecode(response.body).cast<Map<String, dynamic>>();
@@ -343,8 +338,7 @@ class ApiService {
 
   ///1.21 Xem yêu cầu hỗ trợ
   Future<Request?> request(int requestId) async {
-    var uri =
-        Uri.https('sos-connect-api.herokuapp.com', '/requests/$requestId/');
+    var uri = Uri.http('api.sos-connect.asia', 'api/requests/$requestId/');
     var response = await http.get(uri);
     if (response.statusCode == 200) {
       return Request.fromJson(jsonDecode(response.body));
@@ -361,8 +355,8 @@ class ApiService {
       'field': field,
       'sort': sort,
     };
-    var uri = Uri.https('sos-connect-api.herokuapp.com',
-        '/requests/$requestId/supports', parameters);
+    var uri = Uri.http(
+        'api.sos-connect.asia', 'api/requests/$requestId/supports', parameters);
     var response = await http.get(uri);
     if (response.statusCode == 200) {
       var parsed = jsonDecode(response.body).cast<Map<String, dynamic>>();
@@ -375,7 +369,7 @@ class ApiService {
   ///1.24 Tạo hỗ trợ
   Future<void> createSupport(int requestId, String content) async {
     var uri = Uri.parse(
-        'https://sos-connect-api.herokuapp.com/requests/$requestId/supports');
+        'http://api.sos-connect.asia/api/requests/$requestId/supports');
     var accessToken = await UserSecureStorage.readAccessToken();
     var response = await http.post(uri,
         headers: {
@@ -397,8 +391,7 @@ class ApiService {
 
   ///1.25 Chỉnh sửa yêu cầu hổ trợ
   Future<void> updateRequest(int requestId, String content) async {
-    var uri =
-        Uri.https('sos-connect-api.herokuapp.com', '/requests/$requestId');
+    var uri = Uri.http('api.sos-connect.asia', 'api/requests/$requestId');
     var accessToken = await UserSecureStorage.readAccessToken();
     var response = await http.put(uri,
         headers: {
@@ -420,8 +413,7 @@ class ApiService {
 
   ///1.26 Xóa mềm yêu cầu hổ trợ
   Future<void> removeRequest(int requestId) async {
-    var uri =
-        Uri.https('sos-connect-api.herokuapp.com', '/requests/$requestId');
+    var uri = Uri.http('api.sos-connect.asia', 'api/requests/$requestId');
     var accessToken = await UserSecureStorage.readAccessToken();
     var response = await http.delete(
       uri,
@@ -439,8 +431,7 @@ class ApiService {
 
   ///1.28 Người yêu cầu hỗ trợ xác nhận đã nhận hỗ trợ
   Future<void> confirmSupport(int supportId, bool isConfirm) async {
-    var uri = Uri.https(
-        'https://sos-connect-api.herokuapp.com', '/supports/$supportId');
+    var uri = Uri.http('api.sos-connect.asia', 'api/supports/$supportId');
     var accessToken = await UserSecureStorage.readAccessToken();
     var response = await http.put(uri,
         headers: {
@@ -462,8 +453,7 @@ class ApiService {
 
   ///1.29 Người hỗ trợ chỉnh sửa nội dung hỗ trợ
   Future<void> editSupport(int supportId, String content) async {
-    var uri =
-        Uri.https('sos-connect-api.herokuapp.com', '/supports/$supportId');
+    var uri = Uri.https('api.sos-connect.asia', 'api/supports/$supportId');
     var accessToken = await UserSecureStorage.readAccessToken();
     var response = await http.put(uri,
         headers: {
@@ -485,8 +475,7 @@ class ApiService {
 
   ///1.30 người hỗ trợ xóa mềm hỗ trợ
   Future<void> removeSupport(int supportId) async {
-    var uri =
-        Uri.https('sos-connect-api.herokuapp.com', '/supports/$supportId');
+    var uri = Uri.https('api.sos-connect.asia', 'api/supports/$supportId');
     var accessToken = await UserSecureStorage.readAccessToken();
     var response = await http.delete(
       uri,
