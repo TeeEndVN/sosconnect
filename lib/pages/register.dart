@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:sosconnect/blocs/auth/auth_cubit.dart';
 import 'package:sosconnect/blocs/register/register_bloc.dart';
 import 'package:sosconnect/blocs/register/register_event.dart';
@@ -32,19 +33,44 @@ class _RegisterState extends State<Register> {
     return Form(
         key: _formKey,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 40),
-          child: SafeArea(
-              child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _userNameField(),
-              _passwordField(),
-              _confirmPasswordField(),
-              _registerButton(),
-              _showLogin()
-            ],
-          )),
-        ));
+            padding: const EdgeInsets.symmetric(horizontal: 40),
+            child: SafeArea(
+              child: SingleChildScrollView(
+                  physics: const ClampingScrollPhysics(),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Image(
+                          image: AssetImage('assets/logo.png'),
+                          width: 200,
+                          height: 200),
+                      const SizedBox(height: 30),
+                      _registerText(),
+                      const SizedBox(height: 10),
+                      _userNameField(),
+                      _passwordField(),
+                      _confirmPasswordField(),
+                      _registerButton(),
+                      _showLogin()
+                    ],
+                  )),
+            )));
+  }
+
+  Widget _registerText() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Text(
+          'Đăng kí',
+          style: GoogleFonts.lato(
+              color: Colors.grey[700],
+              fontSize: 17,
+              letterSpacing: 0.5,
+              fontWeight: FontWeight.bold),
+        ),
+      ],
+    );
   }
 
   Widget _userNameField() {
